@@ -26,7 +26,6 @@
       margin: 0; width: 100%; height: 100%; overflow: hidden;
       font-family: "Segoe UI", Tahoma, sans-serif; background: var(--bg0); color: var(--ink);
     }
-
     body { display: flex; }
 
     #game {
@@ -79,7 +78,7 @@
     }
 
     .aim-panel {
-      min-width: 280px; padding: 10px 16px;
+      min-width: 300px; padding: 10px 16px;
     }
 
     .aim-main {
@@ -88,7 +87,7 @@
 
     .bottom {
       position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
-      width: min(980px, calc(100vw - 18px));
+      width: min(1020px, calc(100vw - 18px));
       display: flex; justify-content: center;
       pointer-events: none;
     }
@@ -106,12 +105,11 @@
     .stepper {
       width: 40px; height: 40px; border: 1px solid rgba(255,255,255,.2);
       background: rgba(255,255,255,.05); color: var(--ink);
-      border-radius: 10px; font-size: 1.5rem; font-weight: 800; padding: 0;
-      cursor: pointer;
+      border-radius: 10px; font-size: 1.5rem; font-weight: 800; padding: 0; cursor: pointer;
     }
 
     .group {
-      min-width: 180px;
+      min-width: 190px;
       display: flex; flex-direction: column; gap: 5px;
     }
 
@@ -129,16 +127,29 @@
 
     button {
       border: 0; background: linear-gradient(180deg, var(--accent2), var(--accent));
-      color: #1d160f; border-radius: 12px; padding: 12px 18px; font-weight: 900; letter-spacing: .06em;
+      color: #1d160f; border-radius: 12px; padding: 11px 16px; font-weight: 900; letter-spacing: .06em;
       cursor: pointer; box-shadow: 0 10px 18px rgba(255,145,77,.24);
       transition: transform .12s ease, filter .12s ease;
     }
-
-    button:hover { filter: brightness(1.05); }
+    button:hover { filter: brightness(1.08); }
     button:active { transform: translateY(1px); }
 
+    .level-actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-left: 8px;
+    }
+
+    .mini {
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: none;
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
+
     .info-box {
-      position: absolute; left: 18px; top: 92px; width: min(320px, calc(100vw - 36px));
+      position: absolute; left: 18px; top: 92px; width: min(340px, calc(100vw - 36px));
       background: rgba(8, 18, 28, 0.68); border: 1px solid rgba(255,255,255,.14);
       border-radius: 14px; padding: 10px 12px; backdrop-filter: blur(8px);
       box-shadow: 0 12px 24px rgba(0,0,0,.24);
@@ -149,8 +160,7 @@
     }
 
     .stats-row {
-      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
-      font-size: .8rem; color: var(--ink);
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; font-size: .8rem; color: var(--ink);
     }
 
     .stat { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 10px; padding: 7px 8px; }
@@ -160,7 +170,6 @@
       position: absolute; inset: 0; pointer-events: none; opacity: 0;
       background: rgba(255,255,255,.28); transition: opacity .08s ease;
     }
-
     .flash.on { opacity: 1; }
 
     @media (max-width: 760px) {
@@ -219,6 +228,13 @@
 
           <button id="fireBtn">ยิง</button>
           <button id="nextBtn" style="background:linear-gradient(180deg,#f0d78d,#e7b648);">ด่านถัดไป</button>
+
+          <div class="level-actions">
+            <button class="mini" data-difficulty="easy">ง่าย</button>
+            <button class="mini" data-difficulty="normal">ปกติ</button>
+            <button class="mini" data-difficulty="hard">ยาก</button>
+            <button class="mini" data-difficulty="real">สมจริง</button>
+          </div>
         </div>
       </div>
     </div>
@@ -236,7 +252,6 @@
     const angleValue = document.getElementById('angleValue');
     const rangeValue = document.getElementById('rangeValue');
     const flash = document.getElementById('flash');
-
     const scoreText = document.getElementById('scoreText');
     const ammoText = document.getElementById('ammoText');
     const hitText = document.getElementById('hitText');
@@ -252,14 +267,38 @@
       wind: 0.8,
       shot: null,
       particles: [],
-      target: { x: 0, y: 0, r: 26, hit: false, px: 0 },
+      target: { x: 0, y: 0, r: 26, hit: false },
       impact: null,
       difficulty: 'normal',
       night: false,
       status: 'พร้อมยิง',
       lastShot: 0,
-      nextReady: false
+      bonus: 0,
+      driftPhase: 0
     };
+
+    const difficulties = {
+      easy: { label: 'ง่าย', ammo: 12, wind: 0.6, drift: 0.75, score: 1.0 },
+      normal: { label: 'ปกติ', ammo: 9, wind: 0.9, drift: 1.0, score: 1.15 },
+      hard: { label: 'ยาก', ammo: 7, wind: 1.25, drift: 1.25, score: 1.4 },
+      real: { label: 'สมจริง', ammo: 6, wind: 1.65, drift: 1.55, score: 1.6 }
+    };
+
+    function applyDifficulty(name) {
+      state.difficulty = name;
+      const d = difficulties[name] || difficulties.normal;
+      state.ammo = d.ammo;
+      state.wind = d.wind;
+      state.status = `โหมด ${d.label}`;
+      document.querySelectorAll('[data-difficulty]').forEach(btn => {
+        btn.style.background = btn.dataset.difficulty === name
+          ? 'linear-gradient(180deg, #ffd88a, #f0b04a)'
+          : 'rgba(255,255,255,.06)';
+        btn.style.color = btn.dataset.difficulty === name ? '#1d160f' : '#edf6ff';
+        btn.style.border = btn.dataset.difficulty === name ? '1px solid rgba(255,255,255,.2)' : '1px solid rgba(255,255,255,.12)';
+      });
+      updateHud();
+    }
 
     function resize() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -271,23 +310,12 @@
       updateTargetFromRange();
     }
 
-    function difficultySettings() {
-      const map = {
-        easy: { ammo: 12, wind: 0.5, drift: 0.7 },
-        normal: { ammo: 9, wind: 0.9, drift: 1.0 },
-        hard: { ammo: 7, wind: 1.3, drift: 1.25 },
-        real: { ammo: 6, wind: 1.8, drift: 1.55 }
-      };
-      return map[state.difficulty] || map.normal;
-    }
-
     function updateTargetFromRange() {
       const dist = Number(distanceInput.value);
-      const targetX = 150 + dist * 0.92;
+      const targetX = 180 + dist * 0.9;
       const groundY = window.innerHeight * 0.78;
       state.target.x = targetX;
-      state.target.y = groundY - 14;
-      state.target.px = targetX;
+      state.target.y = groundY - 12;
       state.range = dist;
       state.target.hit = false;
     }
@@ -308,12 +336,13 @@
 
     function nextLevel() {
       state.level += 1;
-      const baseRange = 1000 + (state.level * 240);
+      const baseRange = 1000 + (state.level * 260);
       distanceInput.value = String(Math.min(baseRange, 4400));
       angleInput.value = String(Math.min(78, 52 + state.level * 1.3));
-      state.ammo = difficultySettings().ammo;
-      state.status = `ด่าน ${state.level}`;
+      const diff = difficulties[state.difficulty] || difficulties.normal;
+      state.ammo = diff.ammo;
       state.night = state.level % 3 === 0;
+      state.status = `ด่าน ${state.level}`;
       updateHud();
     }
 
@@ -322,37 +351,37 @@
       setTimeout(() => flash.classList.remove('on'), 90);
     }
 
-    function makeAudio(attackHz, decays) {
+    function makeShotSound() {
       const AudioCtor = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtor) return;
-      const ctxAudio = new AudioCtor();
-      const osc = ctxAudio.createOscillator();
-      const gain = ctxAudio.createGain();
-      const noise = ctxAudio.createBufferSource();
-      const buffer = ctxAudio.createBuffer(1, ctxAudio.sampleRate * 0.22, ctxAudio.sampleRate);
+      const audio = new AudioCtor();
+      const osc = audio.createOscillator();
+      const gain = audio.createGain();
+      const noise = audio.createBufferSource();
+      const buffer = audio.createBuffer(1, audio.sampleRate * 0.22, audio.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < data.length; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 1.5);
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 1.6);
       }
       noise.buffer = buffer;
-      const filter = ctxAudio.createBiquadFilter();
+      const filter = audio.createBiquadFilter();
       filter.type = 'lowpass';
       filter.frequency.value = 1700;
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(attackHz, ctxAudio.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(decays, ctxAudio.currentTime + 0.26);
-      gain.gain.setValueAtTime(0.0001, ctxAudio.currentTime);
-      gain.gain.exponentialRampToValueAtTime(1.2, ctxAudio.currentTime + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctxAudio.currentTime + 0.42);
+      osc.frequency.setValueAtTime(120 + state.level * 2, audio.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(38, audio.currentTime + 0.3);
+      gain.gain.setValueAtTime(0.0001, audio.currentTime);
+      gain.gain.exponentialRampToValueAtTime(1.1, audio.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.42);
       osc.connect(gain);
-      gain.connect(ctxAudio.destination);
+      gain.connect(audio.destination);
       noise.connect(filter);
-      filter.connect(ctxAudio.destination);
-      noise.start();
-      noise.stop(ctxAudio.currentTime + 0.1);
+      filter.connect(audio.destination);
       osc.start();
-      osc.stop(ctxAudio.currentTime + 0.44);
-      setTimeout(() => ctxAudio.close(), 500);
+      osc.stop(audio.currentTime + 0.45);
+      noise.start();
+      noise.stop(audio.currentTime + 0.12);
+      setTimeout(() => audio.close(), 500);
     }
 
     function fireShot() {
@@ -361,7 +390,7 @@
       state.lastShot = now;
       state.ammo -= 1;
       const theta = state.angle * Math.PI / 180;
-      const v0 = 125 + state.range * 0.032;
+      const v0 = 120 + state.range * 0.032;
       const x0 = 150;
       const y0 = window.innerHeight * 0.78;
       state.shot = {
@@ -374,18 +403,18 @@
       };
       state.status = 'ยิง...';
       triggerFlash();
-      makeAudio(110 + state.level * 2, 38);
+      makeShotSound();
       updateHud();
     }
 
     function spawnImpact(x, y, hit) {
-      for (let i = 0; i < 36; i++) {
-        const angle = (Math.PI * 2 * i) / 36 + Math.random() * 0.4;
-        const speed = 18 + Math.random() * 42;
+      for (let i = 0; i < 32; i++) {
+        const a = (Math.PI * 2 * i) / 32 + Math.random() * 0.8;
+        const sp = 18 + Math.random() * 40;
         state.particles.push({
           x, y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 12,
+          vx: Math.cos(a) * sp,
+          vy: Math.sin(a) * sp - 10,
           alpha: 1,
           life: 1,
           color: hit ? '#ffd36e' : '#ff7c5a',
@@ -398,9 +427,9 @@
     function updateShot(dt) {
       if (!state.shot) return;
       const s = state.shot;
-      const gravity = 156;
-      const drift = state.wind * 14 * difficultySettings().drift;
-      s.vx += drift * dt * 0.8;
+      const gravity = 170;
+      const drift = state.wind * 15 * (difficulties[state.difficulty] || difficulties.normal).drift;
+      s.vx += drift * dt * 0.7;
       s.vy += gravity * dt;
       s.x += s.vx * dt;
       s.y += s.vy * dt;
@@ -409,14 +438,18 @@
       if (s.trail.length > 24) s.trail.shift();
 
       const groundY = window.innerHeight * 0.78;
+      const targetCenterX = state.target.x;
+      const targetCenterY = state.target.y;
+
       if (s.y >= groundY) {
-        const hit = Math.abs(s.x - state.target.x) < 30 && Math.abs(s.y - state.target.y) < 34;
+        const hit = Math.abs(s.x - targetCenterX) < 30 && Math.abs(s.y - targetCenterY) < 34;
         state.status = hit ? 'โดนเป้า!' : 'พลาด';
         if (hit) {
+          const bonus = difficulties[state.difficulty].score * (10 + state.level * 3);
           state.hits += 1;
-          state.score += 10 + state.level * 3;
+          state.score += Math.round(bonus);
           state.target.hit = true;
-          spawnImpact(state.target.x, state.target.y, true);
+          spawnImpact(targetCenterX, targetCenterY, true);
         } else {
           spawnImpact(s.x, groundY, false);
         }
@@ -430,14 +463,14 @@
         const p = state.particles[i];
         p.x += p.vx * dt;
         p.y += p.vy * dt;
-        p.vy += 32 * dt;
+        p.vy += 28 * dt;
         p.life -= dt * 0.9;
         if (p.life <= 0) state.particles.splice(i, 1);
       }
 
       if (state.impact) {
         state.impact.t += dt;
-        if (state.impact.t > 0.8) state.impact = null;
+        if (state.impact.t > 0.7) state.impact = null;
       }
     }
 
@@ -449,25 +482,26 @@
 
       const grad = ctx.createLinearGradient(0, 0, 0, h);
       grad.addColorStop(0, sky[0]);
-      grad.addColorStop(0.25, sky[1]);
-      grad.addColorStop(0.6, sky[2]);
+      grad.addColorStop(0.3, sky[1]);
+      grad.addColorStop(0.7, sky[2]);
       grad.addColorStop(1, '#6b7b4d');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
 
-      const sunX = state.night ? w * 0.74 : w * 0.82;
+      const sunX = state.night ? w * 0.75 : w * 0.82;
       const sunY = state.night ? h * 0.18 : h * 0.14;
-      const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 60);
+      const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 62);
       sunGrad.addColorStop(0, state.night ? 'rgba(208,225,255,0.9)' : 'rgba(255,241,181,0.95)');
       sunGrad.addColorStop(0.32, state.night ? 'rgba(135,186,255,0.42)' : 'rgba(255,214,140,0.8)');
       sunGrad.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = sunGrad;
-      ctx.beginPath(); ctx.arc(sunX, sunY, 60, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(sunX, sunY, 62, 0, Math.PI * 2); ctx.fill();
 
       if (state.night) {
         for (let i = 0; i < 80; i++) {
-          const x = ((i * 91) % w); const y = ((i * 53) % (h * 0.38));
-          ctx.fillStyle = 'rgba(255,255,255,0.8)';
+          const x = ((i * 91) % w)
+          const y = ((i * 53) % (h * 0.38));
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
           ctx.fillRect(x, y, 2, 2);
         }
       }
@@ -498,8 +532,8 @@
     function drawTarget() {
       const t = state.target;
       const groundY = window.innerHeight * 0.78;
-      const x = t.x;
-      const y = groundY - 10;
+      const x = t.x + Math.sin((performance.now() / 700) + state.level) * 8;
+      const y = groundY - 12;
       ctx.save();
       ctx.translate(x, y);
       ctx.fillStyle = '#f4d66a';
@@ -509,6 +543,8 @@
       ctx.beginPath(); ctx.arc(0, 0, 28, 0, Math.PI * 2); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(30, 0); ctx.moveTo(0, -30); ctx.lineTo(0, 30); ctx.stroke();
       ctx.restore();
+      state.target.x = x;
+      state.target.y = y;
     }
 
     function drawGun() {
@@ -542,7 +578,7 @@
       if (s.trail.length < 2) return;
       ctx.beginPath();
       ctx.strokeStyle = 'rgba(255,230,130,0.95)';
-      ctx.lineWidth = 2.6;
+      ctx.lineWidth = 2.8;
       for (let i = 0; i < s.trail.length; i++) {
         const p = s.trail[i];
         if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
@@ -553,7 +589,7 @@
     function drawImpact() {
       if (!state.impact) return;
       const p = state.impact;
-      const pulse = 14 + Math.sin(p.t * 25) * 4;
+      const pulse = 14 + Math.sin(p.t * 30) * 4;
       ctx.fillStyle = p.hit ? 'rgba(255,214,105,0.9)' : 'rgba(255,110,72,0.8)';
       ctx.beginPath(); ctx.arc(p.x, p.y, pulse, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = p.hit ? 'rgba(255,255,255,0.75)' : 'rgba(255,200,140,0.75)';
@@ -573,7 +609,7 @@
       const x = window.innerWidth - 190;
       const y = 90;
       ctx.fillStyle = 'rgba(8,18,28,0.6)';
-      ctx.fillRect(x, y, 150, 42);
+      ctx.fillRect(x, y, 160, 42);
       ctx.strokeStyle = '#dfeeff';
       ctx.beginPath(); ctx.moveTo(x + 18, y + 22); ctx.lineTo(x + 132, y + 22); ctx.moveTo(x + 100, y + 12); ctx.lineTo(x + 132, y + 22); ctx.lineTo(x + 100, y + 32); ctx.stroke();
       ctx.fillStyle = '#ffd77a';
@@ -592,7 +628,7 @@
       drawParticles();
     }
 
-    function animate(ts) {
+    function animate() {
       const dt = 1 / 60;
       updateShot(dt);
       updateParticles(dt);
@@ -600,18 +636,8 @@
       requestAnimationFrame(animate);
     }
 
-    function syncDifficulty() {
-      const diff = state.difficulty;
-      const settings = difficultySettings();
-      state.ammo = settings.ammo;
-      state.wind = settings.wind;
-      state.status = `โหมด ${diff}`;
-      updateHud();
-    }
-
     document.getElementById('fireBtn').addEventListener('click', fireShot);
     document.getElementById('nextBtn').addEventListener('click', nextLevel);
-
     document.getElementById('angleDown').addEventListener('click', () => {
       const v = Math.max(18, Number(angleInput.value) - 1);
       angleInput.value = String(v);
@@ -622,17 +648,20 @@
       angleInput.value = String(v);
       updateHud();
     });
-
     angleInput.addEventListener('input', updateHud);
     distanceInput.addEventListener('input', updateHud);
-
+    document.querySelectorAll('[data-difficulty]').forEach(btn => {
+      btn.addEventListener('click', () => applyDifficulty(btn.dataset.difficulty));
+    });
     window.addEventListener('resize', resize);
 
     function init() {
       state.difficulty = 'normal';
       state.night = false;
-      state.ammo = difficultySettings().ammo;
-      state.wind = difficultySettings().wind;
+      const diff = difficulties.normal;
+      state.ammo = diff.ammo;
+      state.wind = diff.wind;
+      applyDifficulty('normal');
       updateHud();
       resize();
       requestAnimationFrame(animate);

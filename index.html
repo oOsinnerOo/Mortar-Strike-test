@@ -1,181 +1,173 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mortar Strike</title>
   <style>
     :root {
-      --bg1: #061019;
-      --bg2: #122739;
-      --panel: rgba(8, 18, 29, 0.78);
-      --panel-border: rgba(255,255,255,0.12);
-      --accent: #ff7a30;
-      --accent-2: #ffbf69;
-      --good: #6ae38d;
-      --warn: #ffcb6b;
-      --danger: #ff5d63;
-      --text: #ecf4ff;
-      --muted: #b6c6d9;
-      --shadow: rgba(0,0,0,.42);
+      --bg0: #07131c;
+      --bg1: #112d3f;
+      --ink: #edf6ff;
+      --muted: #bae1ff;
+      --panel: rgba(9, 17, 28, 0.64);
+      --panel-border: rgba(255,255,255,0.14);
+      --gold: #ffd27a;
+      --accent: #ff914d;
+      --accent2: #ffb062;
+      --good: #89f0a5;
+      --warn: #ffdb7a;
+      --danger: #ff6a7a;
+      --shadow: rgba(0,0,0,0.45);
     }
 
     * { box-sizing: border-box; }
     html, body {
-      margin: 0; height: 100%;
-      background: radial-gradient(circle at top, #1a2f47 0%, var(--bg1) 42%, #040c14 100%);
-      color: var(--text);
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      overflow: hidden;
+      margin: 0; width: 100%; height: 100%; overflow: hidden;
+      font-family: "Segoe UI", Tahoma, sans-serif; background: var(--bg0); color: var(--ink);
     }
 
-    body {
-      display: flex; align-items: stretch; justify-content: center;
-    }
+    body { display: flex; }
 
     #game {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
+      position: relative; width: 100vw; height: 100vh;
+      background: linear-gradient(180deg, #5a8dc2 0%, #a7d4ee 18%, #dfe9d1 58%, #6e7a4c 100%);
       overflow: hidden;
-      background: linear-gradient(to bottom, #6fa6d5 0%, #b9d7eb 18%, #dfe5cf 56%, #7a7f5a 100%);
     }
 
     canvas {
-      width: 100%; height: 100%; display: block;
-      background: linear-gradient(to bottom, #7db7e4 0%, #cfebf7 20%, #cfe5aa 62%, #6d7d4a 100%);
+      display: block; width: 100%; height: 100%;
+      background: linear-gradient(180deg, #6ea8d7 0%, #dceaf7 24%, #cfe3af 58%, #6f7c4b 100%);
     }
 
     .hud {
-      position: absolute; inset: 0;
-      pointer-events: none;
+      position: absolute; inset: 0; pointer-events: none;
     }
 
     .topbar {
-      position: absolute; top: 16px; left: 16px; right: 16px;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 14px;
-      pointer-events: none;
+      position: absolute; top: 14px; left: 14px; right: 14px;
+      display: flex; justify-content: space-between; gap: 14px;
+      align-items: flex-start;
     }
 
     .panel {
       background: var(--panel);
       border: 1px solid var(--panel-border);
-      box-shadow: 0 10px 28px var(--shadow);
+      backdrop-filter: blur(8px);
       border-radius: 16px;
-      backdrop-filter: blur(6px);
+      box-shadow: 0 12px 30px var(--shadow);
       pointer-events: auto;
     }
 
-    .status {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 14px;
-      min-width: 220px;
-    }
-
+    .status { display: flex; align-items: center; gap: 12px; padding: 10px 14px; }
     .badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 44px; height: 44px; border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent), #ffaf62);
-      color: #1e1007; font-weight: 900; font-size: 1.1rem;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 20px rgba(255,122,48,.35);
+      width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #1a120e; font-weight: 900; font-size: 1.1rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 8px 18px rgba(255,145,77,.3);
     }
 
-    .status-title {
-      font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
-      display: block; margin-bottom: 2px;
+    .small-label {
+      display: block; font-size: .64rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+      margin-bottom: 2px;
     }
 
-    .status-value {
-      font-size: 1.25rem; font-weight: 800; line-height: 1.1;
+    .status-main { font-size: 1.08rem; font-weight: 800; }
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: var(--good);
+      box-shadow: 0 0 14px rgba(137,240,165,.9); margin-right: 8px; vertical-align: middle;
     }
 
     .aim-panel {
-      display: flex; align-items: center; gap: 14px;
-      padding: 10px 16px;
-      min-width: 340px;
-    }
-
-    .aim-label {
-      font-size: .68rem; color: var(--muted); letter-spacing: .18em; text-transform: uppercase;
+      min-width: 280px; padding: 10px 16px;
     }
 
     .aim-main {
-      font-size: 1.12rem; font-weight: 800;
-      color: var(--text);
-      letter-spacing: .04em;
+      font-size: 1.08rem; font-weight: 800; letter-spacing: .04em;
     }
 
     .bottom {
-      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-      width: min(980px, calc(100vw - 20px));
-      display: flex; align-items: end; justify-content: center;
-      gap: 12px;
+      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+      width: min(980px, calc(100vw - 18px));
+      display: flex; justify-content: center;
       pointer-events: none;
     }
 
     .controls {
-      display: flex; align-items: center; gap: 10px;
-      background: rgba(5,15,22,.7);
-      border: 1px solid rgba(255,255,255,.12);
+      pointer-events: auto;
+      background: rgba(8, 18, 28, 0.75);
+      border: 1px solid var(--panel-border);
       border-radius: 18px;
       padding: 12px 14px;
-      box-shadow: 0 14px 30px rgba(0,0,0,.35);
-      pointer-events: auto;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.34);
+    }
+
+    .stepper {
+      width: 40px; height: 40px; border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.05); color: var(--ink);
+      border-radius: 10px; font-size: 1.5rem; font-weight: 800; padding: 0;
+      cursor: pointer;
     }
 
     .group {
+      min-width: 180px;
       display: flex; flex-direction: column; gap: 5px;
-      min-width: 150px;
     }
 
     .group label {
-      font-size: .68rem; color: var(--muted); letter-spacing: .12em; text-transform: uppercase;
+      font-size: .64rem; color: var(--muted); letter-spacing: .12em; text-transform: uppercase;
     }
 
     .group strong {
-      font-size: 1.15rem;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    button {
-      border: 0; background: linear-gradient(180deg, #ff8a4c, #d9511b);
-      color: #170d09; border-radius: 14px; font-weight: 900; letter-spacing: .05em;
-      padding: 12px 18px; box-shadow: 0 10px 20px rgba(217,81,27,.28);
-      cursor: pointer; transition: transform .12s ease, filter .12s ease;
-    }
-
-    button:hover { filter: brightness(1.06); }
-    button:active { transform: translateY(1px); }
-
-    .stepper {
-      width: 40px; height: 40px; border-radius: 10px; padding: 0; font-size: 1.6rem;
-      background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid rgba(255,255,255,.18);
-      box-shadow: none;
+      font-size: 1.08rem; font-weight: 800; letter-spacing: .04em;
     }
 
     input[type="range"] {
       width: 100%; accent-color: var(--accent);
     }
 
-    .info-dot {
-      width: 10px; height: 10px; border-radius: 50%; background: var(--good); box-shadow: 0 0 12px rgba(106,227,141,.8);
-      display: inline-block;
+    button {
+      border: 0; background: linear-gradient(180deg, var(--accent2), var(--accent));
+      color: #1d160f; border-radius: 12px; padding: 12px 18px; font-weight: 900; letter-spacing: .06em;
+      cursor: pointer; box-shadow: 0 10px 18px rgba(255,145,77,.24);
+      transition: transform .12s ease, filter .12s ease;
     }
 
+    button:hover { filter: brightness(1.05); }
+    button:active { transform: translateY(1px); }
+
+    .info-box {
+      position: absolute; left: 18px; top: 92px; width: min(320px, calc(100vw - 36px));
+      background: rgba(8, 18, 28, 0.68); border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px; padding: 10px 12px; backdrop-filter: blur(8px);
+      box-shadow: 0 12px 24px rgba(0,0,0,.24);
+    }
+
+    .info-box h3 {
+      margin: 0 0 6px; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+    }
+
+    .stats-row {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+      font-size: .8rem; color: var(--ink);
+    }
+
+    .stat { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 10px; padding: 7px 8px; }
+    .stat b { display: block; font-size: 1rem; }
+
     .flash {
-      position: absolute; inset: 0; pointer-events: none; opacity: 0; background: rgba(255,255,255,.25);
-      transition: opacity .12s ease;
+      position: absolute; inset: 0; pointer-events: none; opacity: 0;
+      background: rgba(255,255,255,.28); transition: opacity .08s ease;
     }
 
     .flash.on { opacity: 1; }
 
     @media (max-width: 760px) {
-      .topbar { flex-direction: column; align-items: stretch; }
-      .aim-panel { min-width: 0; flex: 1; }
-      .bottom { bottom: 12px; }
-      .controls { flex-wrap: wrap; }
+      .topbar { flex-direction: column; }
+      .aim-panel { min-width: 0; width: 100%; }
+      .info-box { top: 140px; }
+      .controls { justify-content: center; }
     }
   </style>
 </head>
@@ -188,36 +180,45 @@
         <div class="panel status">
           <div class="badge">M</div>
           <div>
-            <span class="status-title">สถานะ</span>
-            <div class="status-value"><span class="info-dot"></span> Ready</div>
+            <span class="small-label">สถานะ</span>
+            <div class="status-main"><span class="dot"></span><span id="statusText">พร้อมยิง</span></div>
           </div>
         </div>
 
         <div class="panel aim-panel">
-          <div>
-            <div class="aim-label">เล็ง</div>
-            <div class="aim-main" id="aimText">θ 58.0° · ระยะ 1.4 km</div>
-          </div>
+          <div class="small-label">เล็ง</div>
+          <div class="aim-main" id="aimText">θ 58.0° · ระยะ 1.4 km</div>
+        </div>
+      </div>
+
+      <div class="info-box panel">
+        <h3>สถิติ</h3>
+        <div class="stats-row">
+          <div class="stat">ระดับ <b id="levelText">1</b></div>
+          <div class="stat">คะแนน <b id="scoreText">0</b></div>
+          <div class="stat">กระสุน <b id="ammoText">9</b></div>
+          <div class="stat">โดน <b id="hitText">0</b></div>
         </div>
       </div>
 
       <div class="bottom">
         <div class="controls">
           <button class="stepper" id="angleDown" aria-label="ลดมุม">−</button>
-          <div class="group" style="min-width: 170px;">
+          <div class="group">
             <label>มุม</label>
             <strong id="angleValue">58.0°</strong>
-            <input id="angle" type="range" min="20" max="82" value="58" step="0.5">
+            <input id="angle" type="range" min="18" max="82" value="58" step="0.5" />
           </div>
           <button class="stepper" id="angleUp" aria-label="เพิ่มมุม">+</button>
 
-          <div class="group" style="min-width: 170px;">
+          <div class="group">
             <label>ระยะ</label>
             <strong id="rangeValue">1.4 km</strong>
-            <input id="distance" type="range" min="500" max="4200" value="1400" step="10">
+            <input id="distance" type="range" min="400" max="4400" value="1400" step="10" />
           </div>
 
           <button id="fireBtn">ยิง</button>
+          <button id="nextBtn" style="background:linear-gradient(180deg,#f0d78d,#e7b648);">ด่านถัดไป</button>
         </div>
       </div>
     </div>
@@ -230,171 +231,140 @@
     const ctx = canvas.getContext('2d');
     const angleInput = document.getElementById('angle');
     const distanceInput = document.getElementById('distance');
+    const aimText = document.getElementById('aimText');
+    const statusText = document.getElementById('statusText');
     const angleValue = document.getElementById('angleValue');
     const rangeValue = document.getElementById('rangeValue');
-    const aimText = document.getElementById('aimText');
-    const fireBtn = document.getElementById('fireBtn');
     const flash = document.getElementById('flash');
-    const angleDown = document.getElementById('angleDown');
-    const angleUp = document.getElementById('angleUp');
 
-    const world = {
-      w: 0,
-      h: 0,
-      gunX: 160,
-      gunY: 0,
-      targetX: 1400,
-      targetY: 0,
-      targetRadius: 28,
+    const scoreText = document.getElementById('scoreText');
+    const ammoText = document.getElementById('ammoText');
+    const hitText = document.getElementById('hitText');
+    const levelText = document.getElementById('levelText');
+
+    const state = {
+      level: 1,
+      score: 0,
+      hits: 0,
+      ammo: 9,
+      angle: 58,
+      range: 1400,
       wind: 0.8,
       shot: null,
+      particles: [],
+      target: { x: 0, y: 0, r: 26, hit: false, px: 0 },
       impact: null,
-      lastShotAt: 0,
-      score: 0,
-      ammo: 12,
-      message: 'พร้อมยิง',
-      fired: false
+      difficulty: 'normal',
+      night: false,
+      status: 'พร้อมยิง',
+      lastShot: 0,
+      nextReady: false
     };
 
     function resize() {
-      canvas.width = window.innerWidth * devicePixelRatio;
-      canvas.height = window.innerHeight * devicePixelRatio;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
       canvas.style.width = window.innerWidth + 'px';
       canvas.style.height = window.innerHeight + 'px';
-      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-      world.w = window.innerWidth;
-      world.h = window.innerHeight;
-      world.gunY = world.h * 0.78;
-      world.targetY = world.h * 0.78 - 30;
-      world.targetX = Number(distanceInput.value);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      updateTargetFromRange();
     }
 
-    function applyUI() {
-      const angle = Number(angleInput.value);
-      const distance = Number(distanceInput.value);
-      angleValue.textContent = `${angle.toFixed(1)}°`;
-      rangeValue.textContent = `${(distance / 1000).toFixed(1)} km`;
-      aimText.textContent = `θ ${angle.toFixed(1)}° · ระยะ ${(distance / 1000).toFixed(1)} km`;
-      world.wind = (Math.sin(Date.now() / 1000) * 0.9 + 0.4).toFixed(2);
+    function difficultySettings() {
+      const map = {
+        easy: { ammo: 12, wind: 0.5, drift: 0.7 },
+        normal: { ammo: 9, wind: 0.9, drift: 1.0 },
+        hard: { ammo: 7, wind: 1.3, drift: 1.25 },
+        real: { ammo: 6, wind: 1.8, drift: 1.55 }
+      };
+      return map[state.difficulty] || map.normal;
     }
 
-    function randomWind() {
-      world.wind = Number((Math.sin(Date.now() / 1600) * 0.9 + 0.2).toFixed(2));
+    function updateTargetFromRange() {
+      const dist = Number(distanceInput.value);
+      const targetX = 150 + dist * 0.92;
+      const groundY = window.innerHeight * 0.78;
+      state.target.x = targetX;
+      state.target.y = groundY - 14;
+      state.target.px = targetX;
+      state.range = dist;
+      state.target.hit = false;
     }
 
-    function updateTerrain() {
-      world.targetX = Number(distanceInput.value) + 130;
-      world.targetY = world.h * 0.78 - 30;
+    function updateHud() {
+      state.angle = Number(angleInput.value);
+      state.range = Number(distanceInput.value);
+      angleValue.textContent = `${state.angle.toFixed(1)}°`;
+      rangeValue.textContent = `${(state.range / 1000).toFixed(1)} km`;
+      aimText.textContent = `θ ${state.angle.toFixed(1)}° · ระยะ ${(state.range / 1000).toFixed(1)} km`;
+      statusText.textContent = state.status;
+      scoreText.textContent = String(state.score);
+      ammoText.textContent = String(state.ammo);
+      hitText.textContent = String(state.hits);
+      levelText.textContent = String(state.level);
+      updateTargetFromRange();
     }
 
-    function drawSky() {
-      const g = ctx.createLinearGradient(0, 0, 0, world.h);
-      g.addColorStop(0, '#6ca5d4');
-      g.addColorStop(0.22, '#d7edf8');
-      g.addColorStop(0.58, '#d6e4ba');
-      g.addColorStop(1, '#677d49');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, world.w, world.h);
-
-      const sun = { x: world.w * 0.82, y: world.h * 0.15, r: 48 };
-      const sunGrad = ctx.createRadialGradient(sun.x, sun.y, 10, sun.x, sun.y, sun.r);
-      sunGrad.addColorStop(0, 'rgba(255,245,180,0.98)');
-      sunGrad.addColorStop(0.25, 'rgba(255,205,110,0.85)');
-      sunGrad.addColorStop(1, 'rgba(255,170,80,0)');
-      ctx.fillStyle = sunGrad;
-      ctx.beginPath(); ctx.arc(sun.x, sun.y, sun.r, 0, Math.PI * 2); ctx.fill();
+    function nextLevel() {
+      state.level += 1;
+      const baseRange = 1000 + (state.level * 240);
+      distanceInput.value = String(Math.min(baseRange, 4400));
+      angleInput.value = String(Math.min(78, 52 + state.level * 1.3));
+      state.ammo = difficultySettings().ammo;
+      state.status = `ด่าน ${state.level}`;
+      state.night = state.level % 3 === 0;
+      updateHud();
     }
 
-    function drawTerrain() {
-      const groundY = world.h * 0.78;
-      const hill1 = ctx.createLinearGradient(0, groundY - 70, 0, world.h);
-      hill1.addColorStop(0, '#7d8a5b');
-      hill1.addColorStop(1, '#4b563a');
-      ctx.fillStyle = hill1;
-      ctx.beginPath();
-      ctx.moveTo(0, groundY);
-      for (let x = 0; x <= world.w; x += 80) {
-        const y = groundY - (Math.sin(x / 150) * 18 + Math.cos(x / 90) * 25 + 30);
-        ctx.lineTo(x, y);
+    function triggerFlash() {
+      flash.classList.add('on');
+      setTimeout(() => flash.classList.remove('on'), 90);
+    }
+
+    function makeAudio(attackHz, decays) {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return;
+      const ctxAudio = new AudioCtor();
+      const osc = ctxAudio.createOscillator();
+      const gain = ctxAudio.createGain();
+      const noise = ctxAudio.createBufferSource();
+      const buffer = ctxAudio.createBuffer(1, ctxAudio.sampleRate * 0.22, ctxAudio.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 1.5);
       }
-      ctx.lineTo(world.w, world.h);
-      ctx.lineTo(0, world.h);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.fillStyle = '#3b4b2b';
-      ctx.fillRect(0, groundY, world.w, world.h - groundY);
+      noise.buffer = buffer;
+      const filter = ctxAudio.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 1700;
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(attackHz, ctxAudio.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(decays, ctxAudio.currentTime + 0.26);
+      gain.gain.setValueAtTime(0.0001, ctxAudio.currentTime);
+      gain.gain.exponentialRampToValueAtTime(1.2, ctxAudio.currentTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctxAudio.currentTime + 0.42);
+      osc.connect(gain);
+      gain.connect(ctxAudio.destination);
+      noise.connect(filter);
+      filter.connect(ctxAudio.destination);
+      noise.start();
+      noise.stop(ctxAudio.currentTime + 0.1);
+      osc.start();
+      osc.stop(ctxAudio.currentTime + 0.44);
+      setTimeout(() => ctxAudio.close(), 500);
     }
 
-    function drawTarget() {
-      const x = world.targetX + 120;
-      const y = world.targetY;
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.fillStyle = '#ffdb85';
-      ctx.beginPath(); ctx.arc(0, 0, 18, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#c7552a';
-      ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(30, 0); ctx.moveTo(0, -30); ctx.lineTo(0, 30); ctx.stroke();
-      ctx.restore();
-    }
-
-    function drawGun() {
-      const x = world.gunX;
-      const angle = Number(angleInput.value) * Math.PI / 180;
-      const y = world.gunY;
-      const barrelLength = 80;
-      const endX = x + Math.cos(angle) * barrelLength;
-      const endY = y - Math.sin(angle) * barrelLength;
-
-      ctx.fillStyle = '#6f5a45';
-      ctx.fillRect(x - 16, y - 10, 32, 20);
-
-      ctx.strokeStyle = '#d7c28d';
-      ctx.lineWidth = 6;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
-
-      ctx.fillStyle = '#a66a3d';
-      ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#2d2d2d';
-      ctx.fillRect(x - 22, y + 12, 44, 8);
-    }
-
-    function drawShell() {
-      if (!world.shot) return;
-      const s = world.shot;
-      ctx.fillStyle = '#ffe7b3';
-      ctx.beginPath(); ctx.arc(s.x, s.y, 6, 0, Math.PI * 2); ctx.fill();
-    }
-
-    function drawImpact() {
-      if (!world.impact) return;
-      const p = world.impact;
-      const r = 18 + Math.sin(Date.now() / 90) * 2;
-      ctx.fillStyle = 'rgba(255,220,120,0.9)';
-      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = 'rgba(255,130,80,0.75)';
-      ctx.beginPath(); ctx.arc(p.x, p.y, r * 0.6, 0, Math.PI * 2); ctx.fill();
-    }
-
-    function shoot() {
+    function fireShot() {
       const now = performance.now();
-      if (now - world.lastShotAt < 220 || world.ammo <= 0) return;
-      world.lastShotAt = now;
-      world.ammo -= 1;
-      world.fired = true;
-
-      const theta = Number(angleInput.value) * Math.PI / 180;
-      const v0 = 120 + Number(distanceInput.value) * 0.028;
-      const x0 = world.gunX;
-      const y0 = world.gunY;
-
-      world.shot = {
+      if (now - state.lastShot < 220 || state.ammo <= 0) return;
+      state.lastShot = now;
+      state.ammo -= 1;
+      const theta = state.angle * Math.PI / 180;
+      const v0 = 125 + state.range * 0.032;
+      const x0 = 150;
+      const y0 = window.innerHeight * 0.78;
+      state.shot = {
         x: x0,
         y: y0,
         vx: Math.cos(theta) * v0,
@@ -402,154 +372,273 @@
         life: 0,
         trail: []
       };
-
-      playShotSound();
-      flash.classList.add('on');
-      setTimeout(() => flash.classList.remove('on'), 80);
+      state.status = 'ยิง...';
+      triggerFlash();
+      makeAudio(110 + state.level * 2, 38);
+      updateHud();
     }
 
-    function playShotSound() {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const audio = new AudioCtx();
-      const osc = audio.createOscillator();
-      const gain = audio.createGain();
-      const noise = audio.createBufferSource();
-      const buffer = audio.createBuffer(1, audio.sampleRate * 0.2, audio.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2);
-
-      noise.buffer = buffer;
-      const filter = audio.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 1300;
-
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(120, audio.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(44, audio.currentTime + 0.3);
-
-      gain.gain.setValueAtTime(0.0001, audio.currentTime);
-      gain.gain.exponentialRampToValueAtTime(1.2, audio.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.45);
-
-      osc.connect(gain);
-      gain.connect(audio.destination);
-      noise.connect(filter);
-      filter.connect(audio.destination);
-      filter.gain.value = 0.35;
-
-      osc.start();
-      osc.stop(audio.currentTime + 0.45);
-      noise.start();
-      noise.stop(audio.currentTime + 0.12);
-      setTimeout(() => audio.close(), 500);
+    function spawnImpact(x, y, hit) {
+      for (let i = 0; i < 36; i++) {
+        const angle = (Math.PI * 2 * i) / 36 + Math.random() * 0.4;
+        const speed = 18 + Math.random() * 42;
+        state.particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 12,
+          alpha: 1,
+          life: 1,
+          color: hit ? '#ffd36e' : '#ff7c5a',
+          r: hit ? 5 : 4
+        });
+      }
+      state.impact = { x, y, r: 24, hit, t: 0 };
     }
 
     function updateShot(dt) {
-      if (!world.shot) return;
-      const s = world.shot;
-      const gravity = 170;
-      const wind = world.wind * 16;
-
-      s.vx += (wind * dt * 0.2);
+      if (!state.shot) return;
+      const s = state.shot;
+      const gravity = 156;
+      const drift = state.wind * 14 * difficultySettings().drift;
+      s.vx += drift * dt * 0.8;
       s.vy += gravity * dt;
       s.x += s.vx * dt;
       s.y += s.vy * dt;
       s.life += dt;
       s.trail.push({ x: s.x, y: s.y });
-      if (s.trail.length > 20) s.trail.shift();
+      if (s.trail.length > 24) s.trail.shift();
 
-      const ground = world.h * 0.78;
-      const targetX = world.targetX + 120;
-      const targetY = world.targetY;
-
-      if (s.y >= ground) {
-        world.impact = { x: s.x, y: ground };
-        const isHit = Math.abs(s.x - targetX) < 32 && Math.abs(ground - targetY) < 40;
-        world.message = isHit ? 'กระสุนโดนเป้า!' : 'พลาดเล็กน้อย – ปรับมุม';
-        if (isHit) {
-          world.score += 1;
-          world.impact = { x: targetX, y: targetY };
+      const groundY = window.innerHeight * 0.78;
+      if (s.y >= groundY) {
+        const hit = Math.abs(s.x - state.target.x) < 30 && Math.abs(s.y - state.target.y) < 34;
+        state.status = hit ? 'โดนเป้า!' : 'พลาด';
+        if (hit) {
+          state.hits += 1;
+          state.score += 10 + state.level * 3;
+          state.target.hit = true;
+          spawnImpact(state.target.x, state.target.y, true);
+        } else {
+          spawnImpact(s.x, groundY, false);
         }
-        world.shot = null;
-        return;
-      }
-
-      const distanceError = Math.abs(s.x - targetX);
-      if (s.life > 7 && distanceError > 250) {
-        world.message = 'หลุดเป้า – ใช้การอ่านลมและมุมใหม่';
-        world.shot = null;
+        state.shot = null;
+        updateHud();
       }
     }
 
-    function drawTrail() {
-      if (!world.shot || world.shot.trail.length < 2) return;
+    function updateParticles(dt) {
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 32 * dt;
+        p.life -= dt * 0.9;
+        if (p.life <= 0) state.particles.splice(i, 1);
+      }
+
+      if (state.impact) {
+        state.impact.t += dt;
+        if (state.impact.t > 0.8) state.impact = null;
+      }
+    }
+
+    function drawSky() {
+      const w = window.innerWidth, h = window.innerHeight;
+      const sky = state.night
+        ? ['#050d16', '#0d1f35', '#243a5d']
+        : ['#5d8dc6', '#bde5f5', '#dfead6'];
+
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, sky[0]);
+      grad.addColorStop(0.25, sky[1]);
+      grad.addColorStop(0.6, sky[2]);
+      grad.addColorStop(1, '#6b7b4d');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      const sunX = state.night ? w * 0.74 : w * 0.82;
+      const sunY = state.night ? h * 0.18 : h * 0.14;
+      const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 60);
+      sunGrad.addColorStop(0, state.night ? 'rgba(208,225,255,0.9)' : 'rgba(255,241,181,0.95)');
+      sunGrad.addColorStop(0.32, state.night ? 'rgba(135,186,255,0.42)' : 'rgba(255,214,140,0.8)');
+      sunGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = sunGrad;
+      ctx.beginPath(); ctx.arc(sunX, sunY, 60, 0, Math.PI * 2); ctx.fill();
+
+      if (state.night) {
+        for (let i = 0; i < 80; i++) {
+          const x = ((i * 91) % w); const y = ((i * 53) % (h * 0.38));
+          ctx.fillStyle = 'rgba(255,255,255,0.8)';
+          ctx.fillRect(x, y, 2, 2);
+        }
+      }
+    }
+
+    function drawGround() {
+      const w = window.innerWidth, h = window.innerHeight;
+      const groundY = h * 0.78;
+      ctx.fillStyle = '#3f5837';
+      ctx.fillRect(0, groundY, w, h - groundY);
+
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(255,238,180,0.9)';
-      ctx.lineWidth = 2.3;
-      for (let i = 0; i < world.shot.trail.length; i++) {
-        const p = world.shot.trail[i];
+      ctx.moveTo(0, groundY);
+      for (let x = 0; x <= w; x += 70) {
+        const y = groundY - (Math.sin(x / 140) * 16 + Math.cos(x / 90) * 22 + 16);
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      ctx.fillStyle = '#7c8b5f';
+      ctx.fill();
+
+      ctx.fillStyle = '#2e3c29';
+      ctx.fillRect(0, h * 0.78, w, 12);
+    }
+
+    function drawTarget() {
+      const t = state.target;
+      const groundY = window.innerHeight * 0.78;
+      const x = t.x;
+      const y = groundY - 10;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = '#f4d66a';
+      ctx.beginPath(); ctx.arc(0, 0, 18, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#d0562f';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(0, 0, 28, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(30, 0); ctx.moveTo(0, -30); ctx.lineTo(0, 30); ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawGun() {
+      const x = 150;
+      const y = window.innerHeight * 0.78;
+      const angle = state.angle * Math.PI / 180;
+      const barrelLen = 86;
+      const ex = x + Math.cos(angle) * barrelLen;
+      const ey = y - Math.sin(angle) * barrelLen;
+
+      ctx.fillStyle = '#6b5848';
+      ctx.fillRect(x - 18, y - 10, 36, 20);
+      ctx.fillStyle = '#2c2c2d';
+      ctx.fillRect(x - 22, y + 10, 44, 10);
+
+      ctx.strokeStyle = '#d8c99d';
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(ex, ey);
+      ctx.stroke();
+
+      ctx.fillStyle = '#b67842';
+      ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.fill();
+    }
+
+    function drawShotTrail() {
+      if (!state.shot) return;
+      const s = state.shot;
+      if (s.trail.length < 2) return;
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(255,230,130,0.95)';
+      ctx.lineWidth = 2.6;
+      for (let i = 0; i < s.trail.length; i++) {
+        const p = s.trail[i];
         if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
       }
       ctx.stroke();
     }
 
-    function drawMessage() {
-      ctx.fillStyle = 'rgba(5,15,22,0.58)';
-      ctx.fillRect(18, 18, 360, 42);
-      ctx.strokeStyle = 'rgba(255,255,255,0.14)';
-      ctx.strokeRect(18, 18, 360, 42);
-      ctx.fillStyle = '#edf4ff';
-      ctx.font = '700 20px Segoe UI';
-      ctx.fillText(world.message, 36, 46);
+    function drawImpact() {
+      if (!state.impact) return;
+      const p = state.impact;
+      const pulse = 14 + Math.sin(p.t * 25) * 4;
+      ctx.fillStyle = p.hit ? 'rgba(255,214,105,0.9)' : 'rgba(255,110,72,0.8)';
+      ctx.beginPath(); ctx.arc(p.x, p.y, pulse, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = p.hit ? 'rgba(255,255,255,0.75)' : 'rgba(255,200,140,0.75)';
+      ctx.beginPath(); ctx.arc(p.x, p.y, pulse * 0.5, 0, Math.PI * 2); ctx.fill();
+    }
 
-      ctx.fillStyle = 'rgba(5,15,22,0.58)';
-      ctx.fillRect(world.w - 210, 18, 180, 42);
-      ctx.fillStyle = '#ffcb6b';
-      ctx.font = '700 20px Segoe UI';
-      ctx.fillText(`คะแนน ${world.score}`, world.w - 190, 46);
+    function drawParticles() {
+      for (const p of state.particles) {
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
 
-      ctx.fillStyle = 'rgba(5,15,22,0.58)';
-      ctx.fillRect(world.w - 195, world.h - 56, 165, 36);
-      ctx.fillStyle = '#cfeaff';
-      ctx.font = '700 18px Segoe UI';
-      ctx.fillText(`กระสุน ${world.ammo}`, world.w - 170, world.h - 32);
+    function drawWind() {
+      const x = window.innerWidth - 190;
+      const y = 90;
+      ctx.fillStyle = 'rgba(8,18,28,0.6)';
+      ctx.fillRect(x, y, 150, 42);
+      ctx.strokeStyle = '#dfeeff';
+      ctx.beginPath(); ctx.moveTo(x + 18, y + 22); ctx.lineTo(x + 132, y + 22); ctx.moveTo(x + 100, y + 12); ctx.lineTo(x + 132, y + 22); ctx.lineTo(x + 100, y + 32); ctx.stroke();
+      ctx.fillStyle = '#ffd77a';
+      ctx.font = '700 16px Segoe UI';
+      ctx.fillText(`ลม ${state.wind.toFixed(1)} m/s`, x + 18, y + 18);
     }
 
     function render() {
-      ctx.clearRect(0, 0, world.w, world.h);
       drawSky();
-      drawTerrain();
+      drawGround();
+      drawWind();
       drawTarget();
       drawGun();
-      drawTrail();
-      drawShell();
+      drawShotTrail();
       drawImpact();
-      drawMessage();
+      drawParticles();
     }
 
-    function loop(ts) {
-      randomWind();
-      updateShot(0.017);
-      applyUI();
+    function animate(ts) {
+      const dt = 1 / 60;
+      updateShot(dt);
+      updateParticles(dt);
       render();
-      requestAnimationFrame(loop);
+      requestAnimationFrame(animate);
     }
 
-    angleInput.addEventListener('input', applyUI);
-    distanceInput.addEventListener('input', () => { updateTerrain(); applyUI(); });
-    fireBtn.addEventListener('click', shoot);
-    angleDown.addEventListener('click', () => { angleInput.value = Math.max(Number(angleInput.min), Number(angleInput.value) - 1); applyUI(); });
-    angleUp.addEventListener('click', () => { angleInput.value = Math.min(Number(angleInput.max), Number(angleInput.value) + 1); applyUI(); });
+    function syncDifficulty() {
+      const diff = state.difficulty;
+      const settings = difficultySettings();
+      state.ammo = settings.ammo;
+      state.wind = settings.wind;
+      state.status = `โหมด ${diff}`;
+      updateHud();
+    }
+
+    document.getElementById('fireBtn').addEventListener('click', fireShot);
+    document.getElementById('nextBtn').addEventListener('click', nextLevel);
+
+    document.getElementById('angleDown').addEventListener('click', () => {
+      const v = Math.max(18, Number(angleInput.value) - 1);
+      angleInput.value = String(v);
+      updateHud();
+    });
+    document.getElementById('angleUp').addEventListener('click', () => {
+      const v = Math.min(82, Number(angleInput.value) + 1);
+      angleInput.value = String(v);
+      updateHud();
+    });
+
+    angleInput.addEventListener('input', updateHud);
+    distanceInput.addEventListener('input', updateHud);
 
     window.addEventListener('resize', resize);
 
-    (function init() {
+    function init() {
+      state.difficulty = 'normal';
+      state.night = false;
+      state.ammo = difficultySettings().ammo;
+      state.wind = difficultySettings().wind;
+      updateHud();
       resize();
-      updateTerrain();
-      applyUI();
-      requestAnimationFrame(loop);
-    })();
+      requestAnimationFrame(animate);
+    }
+
+    init();
   </script>
 </body>
 </html>

@@ -78,39 +78,79 @@
     }
 
     .aim-panel {
-      min-width: 360px; padding: 10px 14px;
+      min-width: 300px; padding: 10px 16px;
     }
 
     .aim-main {
-      font-size: .95rem; font-weight: 800; letter-spacing: .04em; line-height: 1.3;
+      font-size: 1.08rem; font-weight: 800; letter-spacing: .04em;
     }
 
-    .aim-sub {
-      font-size: .75rem; color: var(--muted); margin-top: 4px; line-height: 1.2;
+    .bottom {
+      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+      width: min(1020px, calc(100vw - 18px));
+      display: flex; justify-content: center;
+      pointer-events: none;
     }
 
-    .ballistics {
-      position: absolute; right: 18px; top: 92px; width: min(360px, calc(100vw - 36px));
-      background: rgba(8, 18, 28, 0.72); border: 1px solid rgba(255,255,255,.14);
-      border-radius: 14px; padding: 10px 12px; backdrop-filter: blur(8px);
-      box-shadow: 0 12px 24px rgba(0,0,0,.24); font-size: .8rem;
+    .controls {
+      pointer-events: auto;
+      background: rgba(8, 18, 28, 0.75);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 12px 14px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.34);
     }
 
-    .ballistics h3 {
-      margin: 0 0 6px; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+    .stepper {
+      width: 40px; height: 40px; border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.05); color: var(--ink);
+      border-radius: 10px; font-size: 1.5rem; font-weight: 800; padding: 0; cursor: pointer;
     }
 
-    .ballistics-row {
-      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+    .group {
+      min-width: 190px;
+      display: flex; flex-direction: column; gap: 5px;
     }
 
-    .bstat { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 10px; padding: 6px 8px; }
-    .bstat b { display: block; font-size: .95rem; color: var(--gold); }
-    .bstat small { display: block; color: var(--muted); font-size: .7rem; }
+    .group label {
+      font-size: .64rem; color: var(--muted); letter-spacing: .12em; text-transform: uppercase;
+    }
+
+    .group strong {
+      font-size: 1.08rem; font-weight: 800; letter-spacing: .04em;
+    }
+
+    input[type="range"] {
+      width: 100%; accent-color: var(--accent);
+    }
+
+    button {
+      border: 0; background: linear-gradient(180deg, var(--accent2), var(--accent));
+      color: #1d160f; border-radius: 12px; padding: 11px 16px; font-weight: 900; letter-spacing: .06em;
+      cursor: pointer; box-shadow: 0 10px 18px rgba(255,145,77,.24);
+      transition: transform .12s ease, filter .12s ease;
+    }
+    button:hover { filter: brightness(1.08); }
+    button:active { transform: translateY(1px); }
+
+    .level-actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-left: 8px;
+    }
+
+    .mini {
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: none;
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
 
     .info-box {
-      position: absolute; left: 18px; top: 92px; width: min(320px, calc(100vw - 36px));
-      background: rgba(8, 18, 28, 0.72); border: 1px solid rgba(255,255,255,.14);
+      position: absolute; left: 18px; top: 92px; width: min(340px, calc(100vw - 36px));
+      background: rgba(8, 18, 28, 0.68); border: 1px solid rgba(255,255,255,.14);
       border-radius: 14px; padding: 10px 12px; backdrop-filter: blur(8px);
       box-shadow: 0 12px 24px rgba(0,0,0,.24);
     }
@@ -126,124 +166,16 @@
     .stat { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 10px; padding: 7px 8px; }
     .stat b { display: block; font-size: 1rem; }
 
-    .bottom {
-      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
-      width: min(1100px, calc(100vw - 18px));
-      display: flex; justify-content: center;
-      pointer-events: none;
-    }
-
-    .controls {
-      pointer-events: auto;
-      background: rgba(8, 18, 28, 0.78);
-      border: 2px solid rgba(255,200,100,.18);
-      border-radius: 18px;
-      padding: 12px 14px;
-      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-      box-shadow: 0 14px 32px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,.06);
-    }
-
-    .stepper {
-      width: 40px; height: 40px; border: 1px solid rgba(255,255,255,.2);
-      background: rgba(255,255,255,.05); color: var(--ink);
-      border-radius: 10px; font-size: 1.5rem; font-weight: 800; padding: 0; cursor: pointer;
-      transition: all .1s ease;
-    }
-
-    .stepper:hover { background: rgba(255,255,255,.12); }
-
-    .group {
-      min-width: 200px;
-      display: flex; flex-direction: column; gap: 5px;
-    }
-
-    .group label {
-      font-size: .64rem; color: var(--muted); letter-spacing: .12em; text-transform: uppercase;
-    }
-
-    .group strong {
-      font-size: 1.1rem; font-weight: 800; letter-spacing: .04em;
-    }
-
-    .group-small {
-      min-width: 140px;
-    }
-
-    input[type="range"] {
-      width: 100%; accent-color: var(--accent);
-    }
-
-    button {
-      border: 0; background: linear-gradient(180deg, var(--accent2), var(--accent));
-      color: #1d160f; border-radius: 12px; padding: 11px 18px; font-weight: 900; letter-spacing: .06em;
-      cursor: pointer; box-shadow: 0 10px 18px rgba(255,145,77,.24), inset 0 1px 0 rgba(255,255,255,.2);
-      transition: transform .12s ease, filter .12s ease;
-    }
-    button:hover { filter: brightness(1.08); }
-    button:active { transform: translateY(1px); }
-
-    .level-actions {
-      display: flex; gap: 6px; flex-wrap: wrap;
-      margin-left: 4px;
-    }
-
-    .mini {
-      background: rgba(255,255,255,.06);
-      color: var(--ink);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: none;
-      padding: 7px 10px;
-      border-radius: 10px;
-      font-size: .8rem;
-      transition: all .15s ease;
-    }
-
-    .mini:hover { background: rgba(255,255,255,.1); }
-
     .flash {
       position: absolute; inset: 0; pointer-events: none; opacity: 0;
-      background: rgba(255,255,255,.32); transition: opacity .08s ease;
+      background: rgba(255,255,255,.28); transition: opacity .08s ease;
     }
     .flash.on { opacity: 1; }
 
-    .wind-indicator {
-      position: absolute; top: 18px; right: 18px;
-      width: 180px; height: 80px;
-      background: rgba(8, 18, 28, 0.68);
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 14px;
-      padding: 10px;
-      backdrop-filter: blur(8px);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-
-    .wind-arrow {
-      width: 0; height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 12px solid var(--accent);
-      margin-bottom: 4px;
-      transition: transform .2s ease;
-    }
-
-    .wind-text {
-      font-size: .8rem; font-weight: 700; color: var(--gold);
-    }
-
-    .wind-sub {
-      font-size: .65rem; color: var(--muted);
-    }
-
-    @media (max-width: 1024px) {
-      .aim-panel { min-width: 300px; }
-      .ballistics { display: none; }
-    }
-
-    @media (max-width: 768px) {
+    @media (max-width: 760px) {
       .topbar { flex-direction: column; }
       .aim-panel { min-width: 0; width: 100%; }
       .info-box { top: 140px; }
-      .wind-indicator { display: none; }
       .controls { justify-content: center; }
     }
   </style>
@@ -263,535 +195,281 @@
         </div>
 
         <div class="panel aim-panel">
-          <div class="small-label">พิกัดเล็ง</div>
+          <div class="small-label">เล็ง</div>
           <div class="aim-main" id="aimText">θ 58.0° · ระยะ 1.4 km</div>
-          <div class="aim-sub" id="aimSub">เวลาลอย: 3.2 วินาที | ลืออำนาจ: 180 ม.</div>
         </div>
       </div>
 
-      <div class="wind-indicator">
-        <div class="wind-arrow" id="windArrow"></div>
-        <div class="wind-text" id="windValue">0.8 m/s</div>
-        <div class="wind-sub">ลมพื้น</div>
-      </div>
-
-      <div class="info-box panel">
-        <h3>สถิติการยิง</h3>
+      <div class="info-box">
+        <h3>ข้อมูล</h3>
         <div class="stats-row">
-          <div class="stat">ระดับ <b id="levelText">1</b></div>
-          <div class="stat">คะแนน <b id="scoreText">0</b></div>
-          <div class="stat">กระสุน <b id="ammoText">9</b></div>
-          <div class="stat">โดน <b id="hitText">0</b></div>
-        </div>
-      </div>
-
-      <div class="ballistics panel">
-        <h3>สมการลูกกระสุน</h3>
-        <div class="ballistics-row">
-          <div class="bstat">
-            <small>ความเร็วเริ่ม</small>
-            <b id="muzzleVel">156 m/s</b>
-          </div>
-          <div class="bstat">
-            <small>เวลาลอย</small>
-            <b id="flightTime">3.2s</b>
-          </div>
-          <div class="bstat">
-            <small>ลืออำนาจ</small>
-            <b id="deflection">180 m</b>
-          </div>
-          <div class="bstat">
-            <small>ระยะยิงสูงสุด</small>
-            <b id="maxRange">4400 m</b>
-          </div>
+          <div class="stat"><b id="distX">0 m</b><small>ระยะเป้า</small></div>
+          <div class="stat"><b id="altY">0 m</b><small>ความสูง</small></div>
+          <div class="stat"><b id="projectileRange">0 m</b><small>โพรเจกไทล์</small></div>
+          <div class="stat"><b id="windInfo">0 m/s</b><small>ลมทิศ</small></div>
         </div>
       </div>
 
       <div class="bottom">
         <div class="controls">
-          <button class="stepper" id="angleDown" aria-label="ลดมุม">−</button>
           <div class="group">
-            <label>มุมยิง (มิล)</label>
-            <strong id="angleValue">58.0°</strong>
-            <input id="angle" type="range" min="18" max="82" value="58" step="0.5" />
+            <label>มุมยิง (θ)</label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button class="stepper" data-angle="-1">−</button>
+              <strong id="angleValue" style="min-width: 50px;">58°</strong>
+              <button class="stepper" data-angle="+1">+</button>
+            </div>
           </div>
-          <button class="stepper" id="angleUp" aria-label="เพิ่มมุม">+</button>
 
           <div class="group">
-            <label>ระยะเป้า</label>
-            <strong id="rangeValue">1.4 km</strong>
-            <input id="distance" type="range" min="400" max="4400" value="1400" step="10" />
+            <label>ความเร็ว</label>
+            <input type="range" id="velocitySlider" min="10" max="100" value="45" />
+            <strong id="velocityValue">45 m/s</strong>
           </div>
 
-          <div class="group group-small">
-            <label>ดินส่ง</label>
-            <strong id="chargeValue">มาตรฐาน</strong>
-          </div>
-
-          <button id="fireBtn">ยิง</button>
-          <button id="nextBtn" style="background:linear-gradient(180deg,#f0d78d,#e7b648);">ด่านถัดไป</button>
+          <button id="fireBtn">🎯 ยิง!</button>
 
           <div class="level-actions">
-            <button class="mini" data-difficulty="easy">ง่าย</button>
-            <button class="mini" data-difficulty="normal">ปกติ</button>
-            <button class="mini" data-difficulty="hard">ยาก</button>
-            <button class="mini" data-difficulty="real">สมจริง</button>
+            <button class="mini" onclick="resetLevel()">รีเซ็ต</button>
+            <button class="mini" onclick="togglePause()">หยุด/เล่น</button>
           </div>
         </div>
       </div>
     </div>
-
     <div class="flash" id="flash"></div>
   </div>
 
   <script>
     const canvas = document.getElementById('scene');
     const ctx = canvas.getContext('2d');
-    const angleInput = document.getElementById('angle');
-    const distanceInput = document.getElementById('distance');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    const state = {
-      level: 1,
-      score: 0,
-      hits: 0,
-      ammo: 9,
+    let gameState = {
       angle: 58,
-      range: 1400,
-      windSpeed: 0.8,
-      windDirection: 0,
-      shot: null,
-      particles: [],
-      target: { x: 0, y: 0, r: 26, hit: false },
-      impact: null,
-      difficulty: 'normal',
-      night: false,
-      status: 'พร้อมยิง',
-      lastShot: 0,
-      charge: 1,
-      physics: {
-        gravity: 9.81,
-        airDensity: 1.225,
-        dragCoefficient: 0.25
-      }
+      velocity: 45,
+      wind: 2,
+      targetX: 8000,
+      targetY: 500,
+      projectiles: [],
+      isPaused: false,
+      canFire: true,
+      score: 0
     };
 
-    const difficulties = {
-      easy: { label: 'ง่าย', ammo: 12, wind: 0.5, windGust: 0.3, score: 1.0 },
-      normal: { label: 'ปกติ', ammo: 9, wind: 0.8, windGust: 0.5, score: 1.15 },
-      hard: { label: 'ยาก', ammo: 7, wind: 1.2, windGust: 0.8, score: 1.4 },
-      real: { label: 'สมจริง', ammo: 6, wind: 1.6, windGust: 1.1, score: 1.6 }
-    };
+    const G = 9.81;
 
-    function calculateMuzzleVelocity(range, angle) {
-      const angleRad = angle * Math.PI / 180;
-      const g = 9.81;
-      const sinDouble = Math.sin(2 * angleRad);
-      const v0Squared = (g * range) / Math.max(0.001, sinDouble);
-      return Math.sqrt(Math.max(0, v0Squared)) || 120;
+    function drawTerrain() {
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, '#6ea8d7');
+      gradient.addColorStop(0.24, '#dceaf7');
+      gradient.addColorStop(0.58, '#cfe3af');
+      gradient.addColorStop(1, '#6f7c4b');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const groundY = canvas.height * 0.7;
+      ctx.fillStyle = '#4a5a3a';
+      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
     }
 
-    function calculateFlightTime(v0, angle) {
-      const angleRad = angle * Math.PI / 180;
-      const g = 9.81;
-      return (2 * v0 * Math.sin(angleRad)) / g;
-    }
+    function drawBase() {
+      const baseX = 100;
+      const baseY = canvas.height * 0.7 - 40;
 
-    function calculateDeflection(flightTime, windSpeed) {
-      return windSpeed * flightTime;
-    }
+      ctx.fillStyle = '#2a3a1a';
+      ctx.fillRect(baseX - 60, baseY, 120, 50);
+      ctx.strokeStyle = '#8aaa5a';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(baseX - 60, baseY, 120, 50);
 
-    function updateBallisticsHUD() {
-      const muzzleVel = calculateMuzzleVelocity(state.range, state.angle);
-      const flightT = calculateFlightTime(muzzleVel, state.angle);
-      const deflect = calculateDeflection(flightT, state.windSpeed);
+      const mortarX = baseX;
+      const mortarY = baseY - 15;
 
-      document.getElementById('muzzleVel').textContent = muzzleVel.toFixed(0) + ' m/s';
-      document.getElementById('flightTime').textContent = flightT.toFixed(2) + 's';
-      document.getElementById('deflection').textContent = deflect.toFixed(0) + ' m';
-      document.getElementById('maxRange').textContent = state.range + ' m';
-      document.getElementById('aimSub').textContent = `เวลาลอย: ${flightT.toFixed(1)} วินาที | ลืออำนาจ: ${deflect.toFixed(0)} ม.`;
-    }
-
-    function applyDifficulty(name) {
-      state.difficulty = name;
-      const d = difficulties[name] || difficulties.normal;
-      state.ammo = d.ammo;
-      state.windSpeed = d.wind + (Math.random() - 0.5) * d.windGust;
-      state.windDirection = Math.random() * Math.PI * 2;
-      state.status = `โหมด ${d.label}`;
-      document.querySelectorAll('[data-difficulty]').forEach(btn => {
-        btn.style.background = btn.dataset.difficulty === name
-          ? 'linear-gradient(180deg, #ffd88a, #f0b04a)'
-          : 'rgba(255,255,255,.06)';
-        btn.style.color = btn.dataset.difficulty === name ? '#1d160f' : '#edf6ff';
-        btn.style.border = btn.dataset.difficulty === name ? '1px solid rgba(255,255,255,.2)' : '1px solid rgba(255,255,255,.12)';
-      });
-      updateHud();
-    }
-
-    function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.round(window.innerWidth * dpr);
-      canvas.height = Math.round(window.innerHeight * dpr);
-      canvas.style.width = window.innerWidth + 'px';
-      canvas.style.height = window.innerHeight + 'px';
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      updateTargetFromRange();
-    }
-
-    function updateTargetFromRange() {
-      const dist = Number(distanceInput.value);
-      const targetX = 180 + dist * 0.9;
-      const groundY = window.innerHeight * 0.78;
-      state.target.x = targetX;
-      state.target.y = groundY - 12;
-      state.range = dist;
-      state.target.hit = false;
-    }
-
-    function updateHud() {
-      state.angle = Number(angleInput.value);
-      state.range = Number(distanceInput.value);
-      document.getElementById('angleValue').textContent = `${state.angle.toFixed(1)}°`;
-      document.getElementById('rangeValue').textContent = `${(state.range / 1000).toFixed(1)} km`;
-      document.getElementById('aimText').textContent = `θ ${state.angle.toFixed(1)}° · ระยะ ${(state.range / 1000).toFixed(1)} km`;
-      document.getElementById('statusText').textContent = state.status;
-      document.getElementById('scoreText').textContent = String(state.score);
-      document.getElementById('ammoText').textContent = String(state.ammo);
-      document.getElementById('hitText').textContent = String(state.hits);
-      document.getElementById('levelText').textContent = String(state.level);
-      document.getElementById('windValue').textContent = state.windSpeed.toFixed(1) + ' m/s';
-      document.getElementById('windArrow').style.transform = `rotate(${(state.windDirection * 180 / Math.PI) + 90}deg)`;
-      document.getElementById('chargeValue').textContent = ['ต่ำ', 'มาตรฐาน', 'สูง'][state.charge];
-      updateBallisticsHUD();
-      updateTargetFromRange();
-    }
-
-    function nextLevel() {
-      state.level += 1;
-      const baseRange = 1000 + (state.level * 280);
-      distanceInput.value = String(Math.min(baseRange, 4400));
-      angleInput.value = String(Math.min(78, 50 + state.level * 1.5));
-      const diff = difficulties[state.difficulty] || difficulties.normal;
-      state.ammo = diff.ammo;
-      state.night = state.level % 4 === 0;
-      state.status = `ด่าน ${state.level}`;
-      state.windSpeed = diff.wind + (Math.random() - 0.5) * diff.windGust;
-      state.windDirection = Math.random() * Math.PI * 2;
-      updateHud();
-    }
-
-    function triggerFlash() {
-      const flash = document.getElementById('flash');
-      flash.classList.add('on');
-      setTimeout(() => flash.classList.remove('on'), 90);
-    }
-
-    function makeShotSound() {
-      const AudioCtor = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtor) return;
-      const audio = new AudioCtor();
-      const osc = audio.createOscillator();
-      const gain = audio.createGain();
-      const noise = audio.createBufferSource();
-      const buffer = audio.createBuffer(1, audio.sampleRate * 0.25, audio.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < data.length; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 1.7);
-      }
-      noise.buffer = buffer;
-      const filter = audio.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 1800;
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(125 + state.level * 2.5, audio.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(42, audio.currentTime + 0.32);
-      gain.gain.setValueAtTime(0.0001, audio.currentTime);
-      gain.gain.exponentialRampToValueAtTime(1.15, audio.currentTime + 0.025);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.48);
-      osc.connect(gain);
-      gain.connect(audio.destination);
-      noise.connect(filter);
-      filter.connect(audio.destination);
-      osc.start();
-      osc.stop(audio.currentTime + 0.5);
-      noise.start();
-      noise.stop(audio.currentTime + 0.13);
-      setTimeout(() => audio.close(), 550);
-    }
-
-    function fireShot() {
-      const now = performance.now();
-      if (now - state.lastShot < 220 || state.ammo <= 0) return;
-      state.lastShot = now;
-      state.ammo -= 1;
-
-      const muzzleVel = calculateMuzzleVelocity(state.range, state.angle);
-      const theta = state.angle * Math.PI / 180;
-      const x0 = 150;
-      const y0 = window.innerHeight * 0.78;
-
-      state.shot = {
-        x: x0,
-        y: y0,
-        vx: Math.cos(theta) * muzzleVel,
-        vy: -Math.sin(theta) * muzzleVel,
-        life: 0,
-        trail: []
-      };
-      state.status = 'ยิง...';
-      triggerFlash();
-      makeShotSound();
-      updateHud();
-    }
-
-    function spawnImpact(x, y, hit) {
-      for (let i = 0; i < 32; i++) {
-        const a = (Math.PI * 2 * i) / 32 + Math.random() * 0.8;
-        const sp = 20 + Math.random() * 45;
-        state.particles.push({
-          x, y,
-          vx: Math.cos(a) * sp,
-          vy: Math.sin(a) * sp - 8,
-          alpha: 1,
-          life: 1,
-          color: hit ? '#ffd36e' : '#ff7c5a',
-          r: hit ? 5 : 4
-        });
-      }
-      state.impact = { x, y, r: 26, hit, t: 0 };
-    }
-
-    function updateShot(dt) {
-      if (!state.shot) return;
-      const s = state.shot;
-      const g = 9.81;
-      const windX = Math.cos(state.windDirection) * state.windSpeed * 1.2;
-      s.vx += windX * dt * 0.85;
-      s.vy += g * dt;
-      s.x += s.vx * dt;
-      s.y += s.vy * dt;
-      s.life += dt;
-      s.trail.push({ x: s.x, y: s.y });
-      if (s.trail.length > 28) s.trail.shift();
-
-      const groundY = window.innerHeight * 0.78;
-      if (s.y >= groundY) {
-        const hit = Math.abs(s.x - state.target.x) < 32 && Math.abs(s.y - state.target.y) < 36;
-        state.status = hit ? 'โดนเป้า!' : 'พลาด';
-        if (hit) {
-          const bonus = difficulties[state.difficulty].score * (10 + state.level * 3.5);
-          state.hits += 1;
-          state.score += Math.round(bonus);
-          state.target.hit = true;
-          spawnImpact(state.target.x, state.target.y, true);
-        } else {
-          spawnImpact(s.x, groundY, false);
-        }
-        state.shot = null;
-        updateHud();
-      }
-    }
-
-    function updateParticles(dt) {
-      for (let i = state.particles.length - 1; i >= 0; i--) {
-        const p = state.particles[i];
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
-        p.vy += 28 * dt;
-        p.life -= dt * 0.88;
-        if (p.life <= 0) state.particles.splice(i, 1);
-      }
-
-      if (state.impact) {
-        state.impact.t += dt;
-        if (state.impact.t > 0.75) state.impact = null;
-      }
-    }
-
-    function drawSky() {
-      const w = window.innerWidth, h = window.innerHeight;
-      const sky = state.night
-        ? ['#050d16', '#0d1f35', '#243a5d']
-        : ['#5d8dc6', '#bde5f5', '#dfead6'];
-
-      const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, sky[0]);
-      grad.addColorStop(0.3, sky[1]);
-      grad.addColorStop(0.7, sky[2]);
-      grad.addColorStop(1, '#6b7b4d');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
-
-      const sunX = state.night ? w * 0.75 : w * 0.82;
-      const sunY = state.night ? h * 0.18 : h * 0.14;
-      const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 65);
-      sunGrad.addColorStop(0, state.night ? 'rgba(208,225,255,0.9)' : 'rgba(255,241,181,0.95)');
-      sunGrad.addColorStop(0.32, state.night ? 'rgba(135,186,255,0.42)' : 'rgba(255,214,140,0.8)');
-      sunGrad.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = sunGrad;
-      ctx.beginPath(); ctx.arc(sunX, sunY, 65, 0, Math.PI * 2); ctx.fill();
-
-      if (state.night) {
-        for (let i = 0; i < 85; i++) {
-          const x = ((i * 97) % w);
-          const y = ((i * 59) % (h * 0.4));
-          ctx.fillStyle = 'rgba(255,255,255,0.85)';
-          ctx.fillRect(x, y, 2, 2);
-        }
-      }
-    }
-
-    function drawGround() {
-      const w = window.innerWidth, h = window.innerHeight;
-      const groundY = h * 0.78;
-      ctx.fillStyle = '#3f5837';
-      ctx.fillRect(0, groundY, w, h - groundY);
-
+      ctx.fillStyle = '#3a4a2a';
       ctx.beginPath();
-      ctx.moveTo(0, groundY);
-      for (let x = 0; x <= w; x += 70) {
-        const y = groundY - (Math.sin(x / 140) * 16 + Math.cos(x / 90) * 22 + 16);
-        ctx.lineTo(x, y);
-      }
-      ctx.lineTo(w, h);
-      ctx.lineTo(0, h);
-      ctx.closePath();
-      ctx.fillStyle = '#7c8b5f';
+      ctx.arc(mortarX, mortarY, 18, 0, Math.PI * 2);
       ctx.fill();
+      ctx.stroke();
 
-      ctx.fillStyle = '#2e3c29';
-      ctx.fillRect(0, h * 0.78, w, 12);
+      const rad = (gameState.angle * Math.PI) / 180;
+      const barrelEnd = 45;
+      ctx.strokeStyle = '#5a7a4a';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(mortarX, mortarY);
+      ctx.lineTo(mortarX + Math.cos(rad) * barrelEnd, mortarY - Math.sin(rad) * barrelEnd);
+      ctx.stroke();
     }
 
     function drawTarget() {
-      const t = state.target;
-      const groundY = window.innerHeight * 0.78;
-      const driftX = Math.sin((performance.now() / 700) + state.level) * 12;
-      const x = t.x + driftX;
-      const y = groundY - 12;
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.fillStyle = '#f4d66a';
-      ctx.beginPath(); ctx.arc(0, 0, 18, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#d0562f';
-      ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(0, 0, 28, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(-32, 0); ctx.lineTo(32, 0); ctx.moveTo(0, -32); ctx.lineTo(0, 32); ctx.stroke();
-      ctx.restore();
-      state.target.x = x;
-      state.target.y = y;
-    }
+      const screenX = (gameState.targetX / 10000) * canvas.width;
+      const screenY = canvas.height * 0.7 - gameState.targetY;
 
-    function drawGun() {
-      const x = 150;
-      const y = window.innerHeight * 0.78;
-      const angle = state.angle * Math.PI / 180;
-      const barrelLen = 90;
-      const ex = x + Math.cos(angle) * barrelLen;
-      const ey = y - Math.sin(angle) * barrelLen;
-
-      ctx.fillStyle = '#6b5848';
-      ctx.fillRect(x - 18, y - 10, 36, 20);
-      ctx.fillStyle = '#2c2c2d';
-      ctx.fillRect(x - 22, y + 10, 44, 12);
-
-      ctx.strokeStyle = '#d8c99d';
-      ctx.lineWidth = 9;
-      ctx.lineCap = 'round';
+      ctx.fillStyle = 'rgba(255, 106, 122, 0.3)';
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(ex, ey);
+      ctx.arc(screenX, screenY, 40, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#ff6a7a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, 30, 0, Math.PI * 2);
       ctx.stroke();
 
-      ctx.fillStyle = '#b67842';
-      ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.fill();
-    }
-
-    function drawShotTrail() {
-      if (!state.shot) return;
-      const s = state.shot;
-      if (s.trail.length < 2) return;
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(255,230,130,0.95)';
-      ctx.lineWidth = 3;
-      for (let i = 0; i < s.trail.length; i++) {
-        const p = s.trail[i];
-        if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
-      }
+      ctx.arc(screenX, screenY, 20, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, 10, 0, Math.PI * 2);
       ctx.stroke();
     }
 
-    function drawImpact() {
-      if (!state.impact) return;
-      const p = state.impact;
-      const pulse = 16 + Math.sin(p.t * 35) * 5;
-      ctx.fillStyle = p.hit ? 'rgba(255,214,105,0.92)' : 'rgba(255,110,72,0.85)';
-      ctx.beginPath(); ctx.arc(p.x, p.y, pulse, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = p.hit ? 'rgba(255,255,255,0.78)' : 'rgba(255,200,140,0.78)';
-      ctx.beginPath(); ctx.arc(p.x, p.y, pulse * 0.48, 0, Math.PI * 2); ctx.fill();
+    function drawProjectiles() {
+      gameState.projectiles.forEach((p, i) => {
+        const screenX = (p.x / 10000) * canvas.width;
+        const screenY = canvas.height * 0.7 - p.y;
+
+        ctx.fillStyle = '#ffdb7a';
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255, 219, 122, 0.6)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, 12, 0, Math.PI * 2);
+        ctx.stroke();
+      });
     }
 
-    function drawParticles() {
-      for (const p of state.particles) {
-        ctx.globalAlpha = Math.max(0, p.life);
-        ctx.fillStyle = p.color;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
-      }
-      ctx.globalAlpha = 1;
+    function updatePhysics(dt) {
+      if (gameState.isPaused) return;
+
+      gameState.projectiles = gameState.projectiles.filter(p => {
+        p.vx += (gameState.wind * 0.1);
+        p.vy -= G * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+
+        const screenY = canvas.height * 0.7 - p.y;
+        if (screenY > canvas.height * 0.7 || p.x < 0 || p.x > 10000) {
+          return false;
+        }
+
+        const distToTarget = Math.sqrt(
+          Math.pow(p.x - gameState.targetX, 2) +
+          Math.pow(p.y - gameState.targetY, 2)
+        );
+        if (distToTarget < 50) {
+          gameState.score++;
+          flashScreen();
+          return false;
+        }
+
+        return true;
+      });
     }
 
-    function render() {
-      drawSky();
-      drawGround();
-      drawTarget();
-      drawGun();
-      drawShotTrail();
-      drawImpact();
-      drawParticles();
+    function calculateRange() {
+      const rad = (gameState.angle * Math.PI) / 180;
+      const v = gameState.velocity;
+      const sin2a = Math.sin(2 * rad);
+      const range = (v * v * sin2a) / G;
+      return Math.max(0, range);
+    }
+
+    function fire() {
+      if (!gameState.canFire) return;
+
+      gameState.canFire = false;
+
+      const rad = (gameState.angle * Math.PI) / 180;
+      const v = gameState.velocity;
+
+      const projectile = {
+        x: 100,
+        y: canvas.height * 0.7 - 40,
+        vx: Math.cos(rad) * v,
+        vy: Math.sin(rad) * v
+      };
+
+      gameState.projectiles.push(projectile);
+
+      document.getElementById('statusText').textContent = 'ยิงแล้ว...';
+      setTimeout(() => {
+        gameState.canFire = true;
+        document.getElementById('statusText').textContent = 'พร้อมยิง';
+      }, 800);
+    }
+
+    function flashScreen() {
+      const flash = document.getElementById('flash');
+      flash.classList.add('on');
+      setTimeout(() => flash.classList.remove('on'), 80);
+    }
+
+    function updateUI() {
+      document.getElementById('angleValue').textContent = gameState.angle + '°';
+      document.getElementById('velocityValue').textContent = gameState.velocity + ' m/s';
+      document.getElementById('aimText').textContent = 
+        `θ ${gameState.angle}° · ระยะ ${(gameState.targetX / 1000).toFixed(1)} km`;
+      document.getElementById('distX').textContent = gameState.targetX + ' m';
+      document.getElementById('altY').textContent = gameState.targetY + ' m';
+      document.getElementById('projectileRange').textContent = Math.round(calculateRange()) + ' m';
+      document.getElementById('windInfo').textContent = gameState.wind + ' m/s';
+    }
+
+    document.querySelectorAll('[data-angle]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const delta = parseInt(e.target.dataset.angle);
+        gameState.angle = Math.max(1, Math.min(89, gameState.angle + delta));
+        updateUI();
+      });
+    });
+
+    document.getElementById('velocitySlider').addEventListener('input', (e) => {
+      gameState.velocity = parseInt(e.target.value);
+      updateUI();
+    });
+
+    document.getElementById('fireBtn').addEventListener('click', fire);
+
+    function resetLevel() {
+      gameState.projectiles = [];
+      gameState.canFire = true;
+      gameState.score = 0;
+      gameState.angle = 58;
+      gameState.velocity = 45;
+      gameState.wind = Math.random() * 4 - 2;
+      document.getElementById('statusText').textContent = 'พร้อมยิง';
+      updateUI();
+    }
+
+    function togglePause() {
+      gameState.isPaused = !gameState.isPaused;
     }
 
     function animate() {
-      const dt = 1 / 60;
-      updateShot(dt);
-      updateParticles(dt);
-      render();
+      drawTerrain();
+      drawBase();
+      drawTarget();
+      drawProjectiles();
+
+      updatePhysics(0.016);
+      updateUI();
+
       requestAnimationFrame(animate);
     }
 
-    document.getElementById('fireBtn').addEventListener('click', fireShot);
-    document.getElementById('nextBtn').addEventListener('click', nextLevel);
-    document.getElementById('angleDown').addEventListener('click', () => {
-      const v = Math.max(18, Number(angleInput.value) - 1);
-      angleInput.value = String(v);
-      updateHud();
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     });
-    document.getElementById('angleUp').addEventListener('click', () => {
-      const v = Math.min(82, Number(angleInput.value) + 1);
-      angleInput.value = String(v);
-      updateHud();
-    });
-    angleInput.addEventListener('input', updateHud);
-    distanceInput.addEventListener('input', updateHud);
-    document.querySelectorAll('[data-difficulty]').forEach(btn => {
-      btn.addEventListener('click', () => applyDifficulty(btn.dataset.difficulty));
-    });
-    window.addEventListener('resize', resize);
 
-    function init() {
-      state.difficulty = 'normal';
-      state.night = false;
-      const diff = difficulties.normal;
-      state.ammo = diff.ammo;
-      state.windSpeed = diff.wind + (Math.random() - 0.5) * diff.windGust;
-      state.windDirection = Math.random() * Math.PI * 2;
-      applyDifficulty('normal');
-      updateHud();
-      resize();
-      requestAnimationFrame(animate);
-    }
-
-    init();
+    updateUI();
+    animate();
   </script>
 </body>
 </html>

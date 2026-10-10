@@ -107,6 +107,21 @@ button:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
   background:var(--ink);color:var(--sand);border-radius:10px;padding:9px 15px;font-size:15px;line-height:1.45;pointer-events:none;opacity:0;transition:opacity .3s;text-align:center}
 .toast.show{opacity:1}
 .toast.warn{background:var(--danger);color:#fff}
+.float-close{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:999px;border:1.5px solid currentColor;background:rgba(29,33,28,.08);color:inherit;font:700 18px/1 Kanit,sans-serif;display:grid;place-items:center;cursor:pointer;z-index:3}
+.float-close:active{transform:translateY(1px)}
+.table .float-close{top:6px;right:6px}
+.table h4,.table p,.table table,.table canvas,.table .actions,#trpList{position:relative;z-index:1}
+.observerbox,.coach{position:fixed;z-index:26;background:var(--card);color:var(--card-ink);border:2px solid var(--ink);border-radius:12px;box-shadow:6px 6px 0 rgba(29,33,28,.45)}
+.observerbox{left:calc(env(safe-area-inset-left,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 118px);padding:12px 14px 12px 78px;max-width:min(420px,calc(100vw - 28px));opacity:0;transform:translateY(8px);transition:opacity .2s, transform .2s}
+.observerbox.show{opacity:1;transform:translateY(0)}
+.observerbox .avatar{position:absolute;left:12px;top:10px;width:52px;height:52px;border-radius:999px;border:2px solid var(--ink);background:linear-gradient(180deg,#667a48,#3c4928)}
+.observerbox .avatar:before{content:"";position:absolute;left:9px;top:10px;width:32px;height:18px;border-radius:18px 18px 6px 6px;background:#516238}
+.observerbox .avatar:after{content:"";position:absolute;left:15px;top:20px;width:20px;height:20px;border-radius:50%;background:#d8b089;box-shadow:-11px -1px 0 -7px #1d211c,11px -1px 0 -7px #1d211c}
+.observerbox .tag{font-size:12px;opacity:.72;margin-bottom:2px}
+.observerbox .text{font-size:15px;font-weight:600;line-height:1.35}
+.coach{left:calc(env(safe-area-inset-left,0px) + 12px);top:calc(env(safe-area-inset-top,0px) + 120px);width:min(360px,calc(100vw - 24px));padding:12px 14px 14px 14px;max-height:calc(100vh - 170px);overflow:auto}
+.coach h4{margin:0 34px 8px 0;font-size:17px}.coach p{margin:0 0 8px;opacity:.84}.coach ol{margin:8px 0 10px 20px;padding:0}.coach li{margin:0 0 6px}.coach li.on{color:var(--signal);font-weight:700}.coach .calc{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(29,33,28,.08);font-size:13px;line-height:1.45}
+@media (max-width:720px){.coach{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 178px);max-height:42vh}.observerbox{bottom:calc(env(safe-area-inset-bottom,0px) + 118px)}}
 
 .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--scrim);
   padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);overflow:auto}
@@ -314,11 +329,13 @@ body{background:#151b16;color:#eee7d4}
 </div>
 
 <div class="table" id="table" hidden>
+  <button class="float-close" id="tableClose" aria-label="ปิดตารางยิง">×</button>
   <h4 id="tableTitle">ตารางยิง</h4>
   <p id="tableNote">ระยะตกบนพื้นราบ ไม่มีลม หน่วยเมตร</p>
   <table id="tableGrid"></table>
 </div>
 <div class="table gft" id="gft" hidden>
+  <button class="float-close" id="gftClose" aria-label="ปิดไม้บรรทัดคำนวณการยิง">×</button>
   <h4 id="gftTitle">ไม้บรรทัดคำนวณการยิง</h4>
   <p>ลากเส้นกลางไปที่ระยะเป้า อ่านมิลกับเวลาลอยได้ทันที</p>
   <canvas id="gftCv" width="420" height="118" aria-label="ไม้บรรทัดคำนวณการยิง"></canvas>
@@ -327,11 +344,21 @@ body{background:#151b16;color:#eee7d4}
   <div id="trpList" style="margin-top:8px"></div>
 </div>
 <div class="table" id="log" hidden>
+  <button class="float-close" id="logClose" aria-label="ปิดบันทึกการยิง">×</button>
   <h4>บันทึกการยิง</h4>
   <p id="logNote">ทุกนัดที่ตก เทียบกับเป้าที่เลือก ใช้ปรับมิลนัดถัดไป</p>
   <table id="logGrid"></table>
 </div>
 <div class="toast" id="toast" role="status"></div>
+<div class="observerbox" id="observerBox" hidden>
+  <div class="avatar" aria-hidden="true"></div>
+  <div class="tag">ผู้ตรวจการณ์หน้า</div>
+  <div class="text" id="observerText">พร้อมรายงานผลการยิง</div>
+</div>
+<div class="coach" id="coach" hidden>
+  <button class="float-close" id="coachClose" aria-label="ปิดโหมดฝึกสอน">×</button>
+  <div id="coachBody"></div>
+</div>
 
 <div class="overlay open" id="title">
   <div class="title-wrap">
@@ -877,7 +904,7 @@ function makeSoldier(x, speed){
   return {kind:"inf", x, speed:speed*0.6*SPEEDK*(0.85+Math.random()*0.3), hp:20, maxHp:20, state:"intact", phase:Math.random()*6,
           mode:"advance", modeT: 3+Math.random()*9, shootT:1, die:0, flash:0, smoke:0, noise:(Math.random()-.5)*0.24};
 }
-function spawnEnts(){ squadSeq = 0; squads = {}; ents = []; for (const e of L.enemies) spawnEntity(e); waveIdx = 0; waveT = 0; waveSize = ents.length; }
+function spawnEnts(){ squadSeq = 0; squads = {}; ents = []; for (const e of L.enemies) spawnEntity(e); maybePromoteBoss(0); waveIdx = 0; waveT = 0; waveSize = ents.length; }
 let waveIdx = 0, waveT = 0, waveSize = 0;
 let convoy = [], survivalWave = 0;
 function initMission(){
@@ -924,6 +951,7 @@ function spawnWave(){
   const specs = L.waves[waveIdx++]; const before = ents.length;
   for (const e of specs) spawnEntity(e);
   for (let k=before; k<ents.length; k++) ents[k].noise = ents[k].noise ?? (Math.random()-.5)*0.24;
+  maybePromoteBoss(before);
   const cost = {bunker:4, tank:3, squad:3, mortar:3, truck:3, patrol:2, howitzer:3}, add = Math.round(specs.reduce((a,e)=>a+cost[e.kind],0)*WEAPONS[weapon].ammoK*0.9) + 1;
   rounds.he += add; medkits++; if (L.special.air > 0) rounds.air += 1; ammo = totalRounds(); ammoStart += add + (L.special.air > 0 ? 1 : 0);
   waveT = 0; waveSize = ents.length - before;
@@ -931,6 +959,19 @@ function spawnWave(){
   radio("ข้าศึกระลอกใหม่กำลังเข้ามา");
   showToast(`ข้าศึกระลอก ${waveIdx+1}/${L.waves.length+1} กำลังเข้ามา · เสบียงมาถึง HE +${add}`, 4200, true);
 }
+function promoteBoss(e){ if (!e || e.boss) return; e.boss = true; e.alias = BOSS_NAMES[e.kind] || "บอสศัตรู"; const hpK = {inf:2.2, truck:1.9, mortar:2.2, howitzer:1.8, bunker:1.6, tank:1.7}[e.kind] || 1.6;
+  e.maxHp = Math.round((e.maxHp || 20) * hpK + (e.kind === "inf" ? 12 : 0)); e.hp = e.maxHp;
+  if (e.kind === "tank"){ e.speed *= 1.08; e.gunT *= 0.8; }
+  if (e.kind === "mortar" || e.kind === "howitzer"){ e.interval *= 0.8; e.fireT = Math.min(e.fireT || e.interval, e.interval); }
+  if (e.kind === "inf"){ e.speed *= 1.12; e.shootT = 0.8; e.engineer = false; e.medic = false; }}
+function maybePromoteBoss(from){
+  if (!L || L.n === 0) return;
+  const pool = ents.slice(from||0).filter(e => e.hp > 0 && !e.boss && ["tank","howitzer","bunker","mortar","truck","inf"].includes(e.kind));
+  if (!pool.length) return;
+  const late = (L.sector || 0) >= 2 || (waveIdx >= 2) || (L.n >= 6);
+  if (!late && from === 0) return;
+  const pr = {tank:6, howitzer:5, bunker:4, mortar:4, truck:3, inf:2}; pool.sort((a,b)=>(pr[b.kind]-pr[a.kind]) || (b.x-a.x));
+  const pick = pool[0]; promoteBoss(pick); if (state !== "brief"){ showToast(`ตรวจพบ ${bossLabel(pick)}`, 2600, true); setObserverLine(`พบ ${bossLabel(pick)} ในแนวข้าศึก`, 2800); }}
 const alive = () => ents.filter(e => e.hp > 0);
 const BUNK = 1.75;   // bunker sprite scale so a soldier fits the firing slit
 function entBoxes(e){
@@ -1046,6 +1087,9 @@ function drawObstacle(o){
 }
 function wallRect(w){ const gy = groundY(w.x); return {x:w.x-22, y:gy-w.h, w:44, h:w.h+40}; }
 const NAMES = {sniper:"พลซุ่มยิง", target:"เป้าฝึก", bunker:"บังเกอร์", tank:"รถถัง", inf:"ทหารราบ", mortar:"ปืน ค. ข้าศึก", truck:"รถบรรทุก", howitzer:"ปืนใหญ่ข้าศึก"};
+const BOSS_NAMES = {tank:"ผู้บัญชาการรถถัง", bunker:"ศูนย์บัญชาการ", howitzer:"บอสปืนใหญ่", mortar:"ผู้บังคับการปืน ค.", truck:"รถบัญชาการ", inf:"ผู้บัญชาการภาคพื้น", sniper:"ผู้ซุ่มยิงระดับบอส"};
+function ename(e){ return !e ? "" : (e.alias || (e.boss && BOSS_NAMES[e.kind]) || NAMES[e.kind] || e.kind); }
+function bossLabel(e){ return e && e.boss ? (e.alias || BOSS_NAMES[e.kind] || "บอสศัตรู") : ename(e); }
 
 // ============================================================ level flow
 function setState(s){ state = s; stateT = 0; const f = document.getElementById("fireBtn"); if (f) f.disabled = s !== "aim"; }
@@ -1057,13 +1101,13 @@ function prepareLevel(n){
   weapon = L.needs120 ? "120" : L.needs81 ? "81" : "60"; hp = 100; windMs = L.windBase; wind = windMs*2.5; freeCam = false; setWeapon(weapon, true);
   shell = null; lastTrail = []; curTrail = []; parts = []; texts = []; lights = []; decals = []; eshells = []; tracers = []; corpses = []; splats = [];
   mil = 1000; charge = n<=2 ? 2 : 1; recoil = 0; timeScale = 1; slowmo = 0; shake = 0; hurtFlash = 0; endReason = ""; scope = false; flareT = 6;
-  smokes = []; shotLog = []; trps = []; gftR = null; pshells = []; salvoLeft = 0; heat = 0; posShots = 0; detect = 0; prepT = 0; brk = {t:null, over:false, short:false};
+  smokes = []; shotLog = []; trps = []; gftR = null; pshells = []; salvoLeft = 0; heat = 0; posShots = 0; detect = 0; prepT = 0; brk = {t:null, over:false, short:false}; coachDismissed = false;
   crew = {gunner:false, bearer:false}; medkits = 2 + upg("medic"); healT = 0; moveT = 0; posIdx = 0; fires = []; weatherT = 100 + Math.random()*60;
   stats = {direct:0, kills:0, shots:0, hitShots:0, firstHit:0, longest:0, time:0};
   drones = []; uav = null; uavLeft = 2 + upg("uav"); supportLeft = 1; support = null; droneT = 45 + Math.random()*30; load = null; earsT = 0; camHold = 0; impactPt = null;
   sandMax = 100 + 40*upg("bags"); sandHp = sandMax; repairs = 2 + upg("crew"); uz = 1;
   for (const e of ents) e.noise = (Math.random()-.5)*0.24;
-  Audio.stopAll(); selected = nearestAlive(); frameAim(true);
+  Audio.stopAll(); selected = nearestAlive(); frameAim(true); setTimeout(observerTargetReport, 260);
 }
 function showBriefing(n){
   prepareLevel(n); setState("brief");
@@ -1273,8 +1317,8 @@ function updateTargetChip(){
   if (!selected){ tgtInfo = ""; return; }
   const d = m(selected.x - SOCKET_X), dh = m(groundY(SOCKET_X) - groundY(selected.x));
   tgtInfo = (typeof seen === "function" && !seen(selected))
-    ? `เป้า ${NAMES[selected.kind]} ≈${(Math.round(d*(1+(selected.noise||0))/50)*50).toLocaleString()} ม. (มองไม่ชัด)`
-    : `เป้า ${NAMES[selected.kind]} ${d.toLocaleString()} ม. ${dh>=0?"↑":"↓"}${Math.abs(dh)} ม.`;
+    ? `เป้า ${bossLabel(selected)} ≈${(Math.round(d*(1+(selected.noise||0))/50)*50).toLocaleString()} ม. (มองไม่ชัด)`
+    : `เป้า ${bossLabel(selected)} ${d.toLocaleString()} ม. ${dh>=0?"↑":"↓"}${Math.abs(dh)} ม.`;
 }
 function nearestAlive(){ return alive().sort((a,b)=>a.x-b.x)[0] || null; }
 function buildSeg(){
@@ -1283,8 +1327,19 @@ function buildSeg(){
     b.onclick = () => { if (charge !== i) prepT = 1.2*(crew.bearer ? 2 : 1); charge = i; Audio.click(); updateAim(); updateTable(); }; s.appendChild(b); }
   s.classList.toggle("many", WEAPONS[weapon].charges > 5);
 }
-let toastTimer = 0;
+let toastTimer = 0, observerTimer = 0, coachDismissed = false;
+function setObserverLine(msg, ms){ const b=$("observerBox"), t=$("observerText"); if (!b || !t) return; t.textContent = msg; b.hidden = false; b.classList.add("show"); clearTimeout(observerTimer); observerTimer = setTimeout(()=>{ b.classList.remove("show"); }, ms||3800); }
+function observerTargetReport(){ if (!L || !selected || selected.hp <= 0 || state === "title" || state === "brief") return; const d = m(selected.x - SOCKET_X), dh = m(groundY(SOCKET_X) - groundY(selected.x));
+  const rough = !seen(selected); const rangeTxt = rough ? `ประมาณ ${(Math.round(d/50)*50).toLocaleString()} เมตร มองเห็นไม่ชัด` : `${d.toLocaleString()} เมตร ${dh>=0?"สูงกว่า":"ต่ำกว่า"} ${Math.abs(dh)} เมตร`;
+  setObserverLine(`เป้าหมาย ${bossLabel(selected)} ${rangeTxt}`, 3800); }
+function renderTrainingCoach(){ const box=$("coach"), body=$("coachBody"); if (!box || !body || !L) return; const on = L.n === 0 && !coachDismissed && state !== "title" && state !== "brief" && state !== "over";
+  box.hidden = !on; if (!on) return;
+  const wKey = weapon === "120" ? "120" : "81", c = Math.min(weapon === "120" ? 2 : 4, WEAPONS[wKey].charges-1), r0 = weapon === "120" ? 2400 : 1800, r1 = weapon === "120" ? 2600 : 2000;
+  const ex = milFor(wKey, c, r0), ex2 = milFor(wKey, c, r1), slope = ex && ex2 ? Math.abs(ex.mil - ex2.mil) / Math.abs(r1-r0) : 0.3;
+  const step = stats.shots <= 0 ? 2 : (!brk.over && !brk.short ? 4 : (brk.over && brk.short ? 5 : 4));
+  body.innerHTML = `<h4>โหมดฝึกสอนละเอียด</h4><p>ฝึกคำนวณการยิงทีละขั้น โดยผู้ตรวจการณ์จะรายงานผลแทนกล่องระยะทาง</p><ol><li class="${step===1?'on':''}">เลือกเป้า แล้วฟังผู้ตรวจการณ์บอกระยะ/ความสูง</li><li class="${step===2?'on':''}">เปิดตารางยิงหรือไม้บรรทัดคำนวณ เลือกดินส่งที่ครอบคลุมระยะเป้า</li><li class="${step===3?'on':''}">ตั้งมิลเริ่มต้นจากตาราง แล้วกดยิงนัดแรก</li><li class="${step===4?'on':''}">ถ้าผู้ตรวจการณ์บอก “เพิ่ม” = ลดมิล · “ลด” = เพิ่มมิล</li><li class="${step===5?'on':''}">เมื่อมีทั้งสั้นและเลย ถือว่าคร่อมเป้าแล้ว เปิดยิงหาผล ×3 ได้</li></ol><div class="calc"><b>สูตรลัด</b><br>1) หา 2 แถวระยะใกล้เป้าในตาราง<br>2) คำนวณว่า 100 ม. ≈ ${Math.round(100*slope)} มิล<br>3) ถ้าผู้ตรวจการณ์สั่ง “ลด 100” ให้ <b>เพิ่ม</b> มิลประมาณ ${Math.round(100*slope)} มิล<br>4) ถ้าสั่ง “เพิ่ม 100” ให้ <b>ลด</b> มิลประมาณ ${Math.round(100*slope)} มิล</div>`; }
 function showToast(msg, ms, warn){ const t=$("toast"); if (state !== "title" && L) t.style.top = (miniRect().y + miniRect().h + 8) + "px"; t.textContent = msg; t.classList.toggle("warn", !!warn); t.classList.add("show");
+  if (/^ผู้ตรวจการณ์:/u.test(msg)) setObserverLine(msg.replace(/^ผู้ตรวจการณ์:\s*/u, ""), ms || 3800);
   clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove("show"), ms||3500); }
 function setMuteIcon(){
   $("muteIcon").innerHTML = Audio.muted
@@ -1949,14 +2004,16 @@ function explode(hit){
   }
 }
 let brk = {t:null, over:false, short:false};
+function spawnShards(x, y, n, cols){ for (let i=0;i<n;i++){ const a = Math.random()*Math.PI*2, sp = 80 + Math.random()*260; parts.push({k:"debris", x:x+(Math.random()-.5)*18, y:y+(Math.random()-.5)*18, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-120, life:0, max:1.1+Math.random()*1.1, s:4+Math.random()*8, r:Math.random()*6, vr:(Math.random()-.5)*16, c:(cols||["104,88,61","73,73,73","58,81,46"])[i%((cols||[]).length||3)]}); } }
 function kill(e, fromX, sev){
   if (["tank","bunker","mortar","howitzer","truck"].includes(e.kind)) setTimeout(() => radio(`${NAMES[e.kind]}ถูกทำลาย`), 500);
   e.state = "destroyed";
   const gy = groundY(e.x);
-  if (e.kind === "inf"){ moraleHit(e);
+  if (e.kind === "inf"){ moraleHit(e); spawnShards(e.x, gy-55, e.boss ? 18 : 10, e.boss ? ["224,97,44","209,180,106","80,95,60"] : ["87,106,64","56,64,44","136,110,83"]);
     e.die = 0.001; spawnCorpse(e.x, gy, fromX, e.mode === "fire", sev||0); return; }
-  if (e.kind === "mortar"){ blast(e.x+20, gy-20, {big:false, crater:false}); spawnCorpse(e.x+30, gy, fromX, true, sev||0); return; }
-  if (e.kind === "howitzer"){ blast(e.x-20, gy-30, {big:true, crater:false}); spawnCorpse(e.x+60, gy, fromX, true, sev||0); e.burn = 1; return; }
+  if (e.kind === "mortar"){ spawnShards(e.x, gy-30, e.boss ? 16 : 10, ["76,92,49","120,114,100","64,48,36"]); blast(e.x+20, gy-20, {big:false, crater:false}); spawnCorpse(e.x+30, gy, fromX, true, sev||0); return; }
+  if (e.kind === "howitzer"){ spawnShards(e.x+10, gy-60, e.boss ? 20 : 14, ["95,107,118","66,76,85","224,97,44"]); blast(e.x-20, gy-30, {big:true, crater:false}); spawnCorpse(e.x+60, gy, fromX, true, sev||0); e.burn = 1; return; }
+  spawnShards(e.x, gy-40, e.boss ? 22 : 14, ["102,114,124","72,84,92","224,97,44"]);
   setTimeout(() => blast(e.x, gy-40, {big:e.kind !== "truck", crater:false}), 120);
   e.burn = 1;
   if (e.kind === "truck" && !e.dropped) texts.push({x:e.x, y:gy-140, s:"ทำลายก่อนส่งทหาร!", life:0, max:1.8, hot:true});
@@ -2312,11 +2369,11 @@ cv.addEventListener("pointercancel", endPointer);
 function selectAt(sx, sy){
   const v = view();
   // off-screen indicators
-  for (const ind of indicatorsCache) if (Math.abs(sx-ind.sx) < 70 && Math.abs(sy-ind.sy) < 24){ selected = ind.e; updateTargetChip(); updateTable(); Audio.click(); return; }
+  for (const ind of indicatorsCache) if (Math.abs(sx-ind.sx) < 70 && Math.abs(sy-ind.sy) < 24){ selected = ind.e; updateTargetChip(); updateTable(); Audio.click(); observerTargetReport(); return; }
   const wx = cam.x + sx/v.z, wy = cam.y + sy/v.z;
   let best = null, bd = 140;
   for (const e of alive()){ const d = Math.hypot(e.x - wx, (groundY(e.x)-50) - wy); if (d < bd){ bd = d; best = e; } }
-  if (best){ selected = best; updateTargetChip(); updateTable(); Audio.click(); }
+  if (best){ selected = best; updateTargetChip(); updateTable(); Audio.click(); observerTargetReport(); }
 }
 function holdRepeat(btn, fn){
   let t = null, n = 0;
@@ -2388,6 +2445,7 @@ addEventListener("keydown", e => {
 // ============================================================ update
 function update(dtReal){
   stateT += dtReal; clock += dtReal;
+  renderTrainingCoach();
   if (slowmo > 0){ slowmo -= dtReal; if (slowmo <= 0) timeScale = 1; }
   const dt = dtReal * timeScale;
   earsT = Math.max(0, earsT - dtReal);
@@ -2788,6 +2846,19 @@ function guidePages(){
       <li><b>คร่อมได้แล้ว ยิงหาผล</b> เปิด ×3 เพื่อยิงชุด 3 นัด</li>
       <li><b>ยิงหลายนัดแล้วย้ายที่ตั้ง</b> ก่อนข้าศึกจับตำแหน่งได้</li>
     </ol>`},
+  {t:"คำนวณละเอียด", h:`
+    <p><b>ขั้นตอนคำนวณแบบละเอียด</b> สำหรับฝึกจริง</p>
+    <ol>
+      <li>ดูระยะจากผู้ตรวจการณ์หรือเป้าฝึก</li>
+      <li>เลือกดินส่งที่ระยะเป้าอยู่กลางช่วง ไม่ชิดต้นหรือปลายตาราง</li>
+      <li>ใช้ 2 แถวที่คร่อมระยะเป้า แล้วเฉลี่ยหามิล</li>
+      <li>แปลงคำสั่งผู้ตรวจการณ์เป็นมิลด้วยสูตร “ส่วนต่างมิล ÷ ส่วนต่างระยะ”</li>
+      <li>จำง่าย: ผู้ตรวจการณ์สั่ง <b>เพิ่ม</b> ระยะ = คุณต้อง <b>ลด</b> มิล · สั่ง <b>ลด</b> ระยะ = คุณต้อง <b>เพิ่ม</b> มิล</li>
+      <li>เมื่อมีทั้งสั้นและเลย แสดงว่าคร่อมเป้าแล้ว ให้บีบระยะและยิงหาผล</li>
+    </ol>
+    <div class="calc">ตัวอย่างลัด: ถ้าในตาราง 1,800 ม. = 1,081 มิล และ 2,000 ม. = 1,051 มิล
+    <br>ต่างกัน 200 ม. = 30 มิล → 100 ม. ≈ 15 มิล
+    <br>ดังนั้นถ้าผู้ตรวจการณ์บอก “ลด 100” ให้เพิ่มมิลประมาณ 15 มิล</div>`},
   {t:"อ่านตารางยิง", h:`
     <p>ตารางยิงบอกว่าดินส่งที่เลือก ต้องตั้ง<b>กี่มิล</b>ถึงจะตก<b>ระยะเท่าไร</b> บนพื้นราบ ไม่มีลม อากาศมาตรฐาน 21°C 1013 hPa</p>
     <ul><li><b>มิลสูง = ตกใกล้</b> มิลต่ำ = ตกไกล (ปืน ค. ยิงมุมสูง 800–1511 มิล หรือ 45°–85°)</li>
@@ -3259,6 +3330,7 @@ function drawEntBody(e, gy){
     for (let k=0;k<5;k++){ ctx.fillStyle = PAL.sand; ctx.strokeStyle = PAL.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(e.x - 110 + k*24, gy - 7, 13, 8, 0, 0, 7); ctx.fill(); ctx.stroke(); }
   } else if (e.kind === "truck") drawTruck(e, gy);
   else if (e.kind === "inf") drawInfantry(e, gy);
+  if (e.boss && e.hp > 0){ const top = Math.min(...entBoxes(e).map(r=>r.y)); ctx.fillStyle = "rgba(29,33,28,.88)"; if (ctx.roundRect){ ctx.beginPath(); ctx.roundRect(e.x-28, top-62, 56, 22, 7); ctx.fill(); ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 2; ctx.stroke(); } else { ctx.fillRect(e.x-28, top-62, 56, 22); ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 2; ctx.strokeRect(e.x-28, top-62, 56, 22); } ctx.fillStyle = "#ffd166"; ctx.font = "700 12px Kanit, sans-serif"; ctx.textAlign = "center"; ctx.fillText("BOSS", e.x, top-46); }
   if (e.flash > 0){ ctx.globalAlpha = e.flash*2; ctx.fillStyle = "#fff3d6"; for (const r of entBoxes(e)) ctx.fillRect(r.x, r.y, r.w, r.h); ctx.globalAlpha = 1; }
   if (e.hp > 0 && (state==="aim"||state==="intro") && e === selected && !soft(e)){
     const d = entBoxes(e).find(b=>b.direct);
@@ -3394,9 +3466,10 @@ function drawInfantry(e, gy){
 }
 function drawHp(e){
   if (e.kind === "target" || e.hp <= 0 || soft(e) && e.kind === "inf" || !seen(e)) return;
-  const b = entBoxes(e), top = Math.min(...b.map(r=>r.y)), w = e.kind === "mortar" ? 80 : 120, x = e.x - w/2, y = top - 28 - (e.kind==="tank"?12:0);
-  ctx.fillStyle = "rgba(29,33,28,.8)"; ctx.fillRect(x-3, y-3, w+6, 15);
-  ctx.fillStyle = e.hp > e.maxHp*0.6 ? "#9fb35c" : e.hp > e.maxHp*0.25 ? "#e3a43a" : PAL.signal; ctx.fillRect(x, y, w*e.hp/e.maxHp, 9);
+  const b = entBoxes(e), top = Math.min(...b.map(r=>r.y)), w = e.boss ? 150 : (e.kind === "mortar" ? 80 : 120), x = e.x - w/2, y = top - 28 - (e.kind==="tank"?12:0);
+  ctx.fillStyle = "rgba(29,33,28,.82)"; ctx.fillRect(x-3, y-19, w+6, e.boss ? 34 : 15);
+  if (e.boss){ ctx.fillStyle = "#efe5c9"; ctx.font = "700 12px Kanit, sans-serif"; ctx.textAlign = "center"; ctx.fillText(bossLabel(e), e.x, y-6); }
+  ctx.fillStyle = e.boss ? "#ffb34d" : e.hp > e.maxHp*0.6 ? "#9fb35c" : e.hp > e.maxHp*0.25 ? "#e3a43a" : PAL.signal; ctx.fillRect(x, y, w*e.hp/e.maxHp, 9);
 }
 function drawSelection(){
   if (!selected || selected.hp <= 0 || !(state==="aim"||state==="intro")) return;
@@ -3461,68 +3534,26 @@ function drawFO(){
   ctx.fillStyle = "rgba(239,229,201,.85)"; ctx.font = "600 13px Kanit, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ผู้ตรวจการณ์", x - 10, gy - 52);
 }
 function drawSP(rig){
-  const gy = groundY(SOCKET_X), x = SOCKET_X, th = rad(thetaDeg()), mov = state === "move" ? Math.sin(clock*14)*1.5 : 0;
-  const xR = x + 215, xL = x - 190, roof = gy - 205, ink = PAL.ink;
+  const gy = groundY(SOCKET_X), x = SOCKET_X, th = rad(thetaDeg()), mov = state === "move" ? Math.sin(clock*14)*1.2 : 0;
+  const ink = PAL.ink, cabX = x - 235, deckX = x - 48, rearX = x + 208;
   ctx.save(); ctx.translate(0, mov); ctx.lineJoin = "round";
-  // ---- 120 mm tube on its turntable (drawn first so the hull hides the breech)
-  const b = rig.sock, c = Math.cos(th), sn = Math.sin(th), L = SP_LEN;
-  ctx.save(); ctx.translate(b[0], b[1]); ctx.rotate(-th);
-  const tg = ctx.createLinearGradient(0, -12, 0, 12); tg.addColorStop(0, "#6f7f48"); tg.addColorStop(0.45, "#4d5a32"); tg.addColorStop(1, "#2f3820");
-  ctx.fillStyle = tg; ctx.strokeStyle = ink; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(-20, -11, L + 6, 22, 6) : ctx.rect(-20, -11, L + 6, 22); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = "#3a4326"; ctx.fillRect(L - 26, -14, 30, 28); ctx.strokeRect(L - 26, -14, 30, 28);              // muzzle reinforcement
-  ctx.fillStyle = "#24291a"; ctx.fillRect(L + 2, -8, 4, 16);
-  ctx.fillStyle = "#3a4326"; ctx.fillRect(70, -14, 34, 28); ctx.strokeRect(70, -14, 34, 28);                      // recoil collar
-  ctx.fillStyle = PAL.signal; ctx.fillRect(125, -11, 8, 22);
-  ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -6); ctx.lineTo(L - 30, -6); ctx.stroke();
-  ctx.restore();
-  // elevating/traverse mechanism struts from the collar down into the hull
-  const cx = b[0] + c*86, cy = b[1] - sn*86; ctx.strokeStyle = "#2f3820"; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(b[0] + 70, roof + 6); ctx.moveTo(cx, cy); ctx.lineTo(b[0] + 20, roof + 6); ctx.stroke();
-  // ---- tracks & running gear
-  ctx.fillStyle = "#26292a"; ctx.strokeStyle = ink; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(xL + 30, gy - 2); ctx.lineTo(xR - 46, gy - 2); ctx.quadraticCurveTo(xR + 8, gy - 6, xR - 10, gy - 70); ctx.lineTo(xL + 18, gy - 72); ctx.quadraticCurveTo(xL - 18, gy - 36, xL + 30, gy - 2); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.strokeStyle = "rgba(160,160,150,.35)"; ctx.lineWidth = 2; const ph = (state === "move" ? clock*80 : 0) % 14;
-  for (let tx = xL + 30 - ph; tx < xR - 46; tx += 14){ ctx.beginPath(); ctx.moveTo(tx, gy - 2); ctx.lineTo(tx, gy - 9); ctx.stroke(); }
-  const wheel = (wx, wy, r, teeth) => { ctx.save(); ctx.translate(wx, wy); ctx.rotate(state === "move" ? clock*6 : 0);
-    ctx.fillStyle = "#4a4f4c"; ctx.strokeStyle = ink; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = "#353a37"; ctx.beginPath(); ctx.arc(0, 0, r*0.62, 0, 7); ctx.fill();
-    ctx.fillStyle = "#6d7470"; for (let k=0;k<(teeth||5);k++){ const a = k*Math.PI*2/(teeth||5); ctx.beginPath(); ctx.arc(Math.cos(a)*r*0.4, Math.sin(a)*r*0.4, teeth ? 3 : 4, 0, 7); ctx.fill(); }
-    ctx.fillStyle = "#8a908c"; ctx.beginPath(); ctx.arc(0, 0, r*0.18, 0, 7); ctx.fill(); ctx.restore(); };
-  for (let k=0;k<5;k++) wheel(xL + 78 + k*58, gy - 30, 27);
-  wheel(xR - 34, gy - 50, 24, 10); wheel(xL + 26, gy - 46, 22);
-  // ---- hull: aluminium box with sloped glacis
-  const hg = ctx.createLinearGradient(0, roof, 0, gy - 70); hg.addColorStop(0, "#6c7b45"); hg.addColorStop(1, "#4b5830");
-  ctx.fillStyle = hg; ctx.strokeStyle = ink; ctx.lineWidth = 3.5;
-  ctx.beginPath(); ctx.moveTo(xL, gy - 74); ctx.lineTo(xL, roof); ctx.lineTo(xR - 120, roof); ctx.lineTo(xR - 6, gy - 128); ctx.lineTo(xR + 4, gy - 80); ctx.lineTo(xR - 14, gy - 70); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = "rgba(0,0,0,.12)"; ctx.beginPath(); ctx.moveTo(xR - 120, roof); ctx.lineTo(xR - 6, gy - 128); ctx.lineTo(xR + 4, gy - 80); ctx.lineTo(xR - 60, gy - 80); ctx.closePath(); ctx.fill();   // glacis shade
-  ctx.strokeStyle = "rgba(29,33,28,.45)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(xL + 6, gy - 92); ctx.lineTo(xR - 28, gy - 92); ctx.stroke();       // sponson line
-  ctx.fillStyle = "rgba(29,33,28,.5)"; for (let rx = xL + 14; rx < xR - 130; rx += 26){ ctx.beginPath(); ctx.arc(rx, roof + 8, 2, 0, 7); ctx.fill(); }
-  // trim vane, headlight guards, exhaust grille, stowage, tow hooks
-  ctx.fillStyle = "#5c6a3a"; ctx.strokeStyle = ink; ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(xR - 96, roof + 14); ctx.lineTo(xR - 20, gy - 126); ctx.lineTo(xR - 14, gy - 112); ctx.lineTo(xR - 92, roof + 28); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = "#d9d2a8"; ctx.beginPath(); ctx.arc(xR - 10, gy - 100, 6, 0, 7); ctx.fill(); ctx.stroke();
-  ctx.strokeStyle = "#2f3820"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(xR - 10, gy - 100, 11, -1.2, 1.2); ctx.stroke();
-  ctx.fillStyle = "#3a4326"; ctx.fillRect(xR - 150, gy - 160, 44, 34); ctx.strokeStyle = ink; ctx.lineWidth = 2; ctx.strokeRect(xR - 150, gy - 160, 44, 34);
-  ctx.strokeStyle = "rgba(0,0,0,.5)"; ctx.lineWidth = 1.5; for (let gx = xR - 146; gx < xR - 108; gx += 6){ ctx.beginPath(); ctx.moveTo(gx, gy - 156); ctx.lineTo(gx, gy - 130); ctx.stroke(); }
-  ctx.fillStyle = "#56643a"; ctx.strokeStyle = ink; ctx.lineWidth = 2.5; ctx.fillRect(xL + 16, gy - 150, 70, 40); ctx.strokeRect(xL + 16, gy - 150, 70, 40);
-  ctx.fillRect(xL + 96, gy - 150, 50, 40); ctx.strokeRect(xL + 96, gy - 150, 50, 40);
-  ctx.fillStyle = "#e0612c"; ctx.font = "700 16px Kanit, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ค.120", xL + 51, gy - 124);
-  ctx.fillStyle = "#efe5c9"; ctx.font = "600 13px Kanit, sans-serif"; ctx.fillText("ทบ. 21-07", xR - 220, gy - 108);
-  // open rear roof hatch leaves
-  ctx.fillStyle = "#5f6e3c"; ctx.strokeStyle = ink; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(xL + 8, roof); ctx.lineTo(xL - 18, roof - 70); ctx.lineTo(xL + 4, roof - 76); ctx.lineTo(xL + 30, roof); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x + 40, roof); ctx.lineTo(x + 70, roof - 64); ctx.lineTo(x + 90, roof - 58); ctx.lineTo(x + 62, roof); ctx.closePath(); ctx.fill(); ctx.stroke();
-  // commander cupola with .50 MG and shield
-  const cx2 = x + 110;
-  ctx.fillStyle = "#56643a"; ctx.fillRect(cx2 - 26, roof - 26, 52, 26); ctx.strokeRect(cx2 - 26, roof - 26, 52, 26);
-  ctx.fillStyle = "#d8a67b"; ctx.beginPath(); ctx.arc(cx2 - 4, roof - 40, 11, 0, 7); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = "#5d6d3b"; ctx.beginPath(); ctx.arc(cx2 - 4, roof - 45, 13, Math.PI, 0); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = "#4b5830"; ctx.beginPath(); ctx.moveTo(cx2 + 12, roof - 26); ctx.lineTo(cx2 + 14, roof - 62); ctx.lineTo(cx2 + 30, roof - 58); ctx.lineTo(cx2 + 30, roof - 26); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = "#1d211c"; ctx.fillRect(cx2 + 26, roof - 46, 64, 6); ctx.fillRect(cx2 + 18, roof - 50, 18, 12);
-  // antennas
-  ctx.strokeStyle = "#1d211c"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(xL + 20, roof); ctx.quadraticCurveTo(xL + 14 + wind*0.4, roof - 120, xL + 6 + wind*1.2, roof - 210); ctx.moveTo(cx2 - 30, roof - 26); ctx.lineTo(cx2 - 36 + wind*0.8, roof - 160); ctx.stroke();
-  // stabilising spade at the rear when firing
-  if (state !== "move"){ ctx.strokeStyle = "#2f3820"; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(xL + 6, gy - 60); ctx.lineTo(xL - 30, gy + 2); ctx.stroke(); }
+  if (state !== "move"){
+    ctx.strokeStyle = "#384022"; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(x - 40, gy - 84); ctx.lineTo(x - 120, gy + 4); ctx.moveTo(x + 30, gy - 84); ctx.lineTo(x + 118, gy + 4); ctx.stroke();
+    ctx.fillStyle = "#56643a"; ctx.strokeStyle = ink; ctx.lineWidth = 3; ctx.fillRect(x - 140, gy - 6, 42, 10); ctx.strokeRect(x - 140, gy - 6, 42, 10); ctx.fillRect(x + 98, gy - 6, 42, 10); ctx.strokeRect(x + 98, gy - 6, 42, 10);
+  }
+  ctx.fillStyle = "#26292a"; ctx.strokeStyle = ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cabX - 16, gy - 18); ctx.lineTo(rearX + 28, gy - 18); ctx.lineTo(rearX + 16, gy - 54); ctx.lineTo(cabX - 6, gy - 54); ctx.closePath(); ctx.fill(); ctx.stroke();
+  const wheel = (wx, r=26) => { ctx.save(); ctx.translate(wx, gy - 24); ctx.rotate(state === "move" ? clock*7 : 0); ctx.fillStyle = "#272a2c"; ctx.strokeStyle = ink; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(0,0,r,0,7); ctx.fill(); ctx.stroke(); ctx.fillStyle = "#5c625e"; ctx.beginPath(); ctx.arc(0,0,r*0.58,0,7); ctx.fill(); ctx.fillStyle = "#8b918d"; for (let k=0;k<6;k++){ const a=k*Math.PI/3; ctx.beginPath(); ctx.arc(Math.cos(a)*r*0.34, Math.sin(a)*r*0.34, 3, 0, 7); ctx.fill(); } ctx.restore(); };
+  for (const wx of [cabX + 38, x - 32, x + 66, x + 164]) wheel(wx, wx===cabX+38?28:26);
+  const cabG = ctx.createLinearGradient(0, gy - 170, 0, gy - 40); cabG.addColorStop(0, "#7a8950"); cabG.addColorStop(1, "#536136");
+  ctx.fillStyle = cabG; ctx.strokeStyle = ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cabX - 28, gy - 54); ctx.lineTo(cabX - 18, gy - 144); ctx.lineTo(cabX + 66, gy - 144); ctx.lineTo(cabX + 102, gy - 108); ctx.lineTo(cabX + 104, gy - 54); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "rgba(210,230,236,.42)"; ctx.fillRect(cabX - 2, gy - 132, 28, 28); ctx.fillRect(cabX + 32, gy - 132, 28, 28); ctx.fillStyle = "#d7cfab"; ctx.beginPath(); ctx.arc(cabX + 86, gy - 70, 7, 0, 7); ctx.fill();
+  ctx.fillStyle = "#617043"; ctx.strokeStyle = ink; ctx.lineWidth = 3; ctx.fillRect(deckX - 100, gy - 136, 336, 24); ctx.strokeRect(deckX - 100, gy - 136, 336, 24); ctx.fillRect(deckX - 86, gy - 112, 120, 18); ctx.strokeRect(deckX - 86, gy - 112, 120, 18); ctx.fillRect(deckX + 148, gy - 112, 64, 18); ctx.strokeRect(deckX + 148, gy - 112, 64, 18); ctx.fillStyle = "#3b4526"; ctx.fillRect(deckX + 60, gy - 162, 56, 24); ctx.strokeRect(deckX + 60, gy - 162, 56, 24);
+  ctx.fillStyle = PAL.signal; ctx.font = "700 15px Kanit, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ค.120", deckX + 88, gy - 144); ctx.fillStyle = "#efe5c9"; ctx.font = "600 12px Kanit, sans-serif"; ctx.fillText("MGS-120", deckX - 34, gy - 98);
+  const b = rig.sock, Lb = SP_LEN; ctx.fillStyle = "#47542d"; ctx.beginPath(); ctx.arc(b[0], b[1], 26, 0, 7); ctx.fill(); ctx.strokeStyle = ink; ctx.lineWidth = 3; ctx.stroke();
+  ctx.save(); ctx.translate(b[0], b[1]); ctx.rotate(-th); const tg = ctx.createLinearGradient(0, -12, 0, 12); tg.addColorStop(0, "#768653"); tg.addColorStop(.55, "#4c5831"); tg.addColorStop(1, "#2f3820"); ctx.fillStyle = tg; ctx.strokeStyle = ink; ctx.lineWidth = 3; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(-34, -11, Lb + 16, 22, 6); else ctx.rect(-34, -11, Lb + 16, 22); ctx.fill(); ctx.stroke(); ctx.fillStyle = "#394325"; ctx.fillRect(44, -14, 34, 28); ctx.strokeRect(44, -14, 34, 28); ctx.fillRect(Lb - 28, -14, 30, 28); ctx.strokeRect(Lb - 28, -14, 30, 28); ctx.fillStyle = "#24291a"; ctx.fillRect(Lb + 2, -8, 4, 16); ctx.strokeStyle = "rgba(255,255,255,.2)"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-10, -6); ctx.lineTo(Lb - 26, -6); ctx.stroke(); ctx.restore();
+  ctx.strokeStyle = "#2f3820"; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(b[0], b[1]); ctx.lineTo(x - 8, gy - 124); ctx.moveTo(b[0] + 26, b[1] - 12); ctx.lineTo(x + 48, gy - 124); ctx.stroke(); ctx.fillStyle = "#5e6d3d"; ctx.beginPath(); ctx.moveTo(x - 34, gy - 98); ctx.lineTo(x - 26, gy - 186); ctx.lineTo(x + 38, gy - 182); ctx.lineTo(x + 58, gy - 122); ctx.lineTo(x + 28, gy - 98); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle = "#1d211c"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(deckX + 150, gy - 136); ctx.lineTo(deckX + 152 + wind*0.7, gy - 256); ctx.moveTo(deckX + 176, gy - 136); ctx.lineTo(deckX + 184 + wind*0.9, gy - 240); ctx.stroke(); ctx.fillStyle = "#4f5d33"; ctx.fillRect(rearX - 44, gy - 108, 48, 36); ctx.strokeRect(rearX - 44, gy - 108, 48, 36);
+  if (state !== "move"){ ctx.fillStyle = "#d8b089"; ctx.beginPath(); ctx.arc(x + 126, gy - 124, 11, 0, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = "#56643a"; ctx.beginPath(); ctx.arc(x + 126, gy - 129, 13, Math.PI, 0); ctx.fill(); ctx.stroke(); }
   ctx.restore();
 }
 function drawCrew(){
@@ -3636,18 +3667,14 @@ function drawIndicators(v){
   let prevY = -1e9;
   const al = alive(), inf = al.filter(e => e.kind === "inf"), nearInf = inf.sort((a,b)=>a.x-b.x)[0];
   const shown = al.filter(e => !(D().hideUnseen && !seen(e))).filter(e => e.kind !== "inf" || e === nearInf || e === selected);
-  const list = shown.map(e => { const x = (e.x - cam.x)*v.z, y = (groundY(e.x) - 60 - cam.y)*v.z; return [e, x, y]; })
-    .filter(([e,x]) => x >= W - 20).sort((a,b) => a[2]-b[2]);
+  const list = shown.map(e => { const x = (e.x - cam.x)*v.z, y = (groundY(e.x) - 60 - cam.y)*v.z; return [e, x, y]; }).filter(([e,x]) => x >= W - 20).sort((a,b) => a[2]-b[2]);
   for (const [e,x,y] of list){
     const yMin = miniRect().y + miniRect().h + 24, yMax = gfCache*H - 6;
     let yy = clamp(y, yMin, yMax); if (yy < prevY + 34) yy = prevY + 34; if (yy > yMax + 4) break; prevY = yy;
     const sel = e === selected;
-    ctx.fillStyle = sel ? PAL.signal : "rgba(29,33,28,.85)"; ctx.beginPath(); ctx.moveTo(W-12, yy); ctx.lineTo(W-36, yy-14); ctx.lineTo(W-36, yy+14); ctx.closePath(); ctx.fill();
-    ctx.font = "600 13px Kanit, sans-serif"; ctx.textAlign = "right";
-    const dd = m(e.x-SOCKET_X), label = `${NAMES[e.kind]}${e.kind==="inf" && inf.length>1 ? " ×"+inf.length : ""} ${seen(e) ? dd.toLocaleString() : "≈"+(Math.round(dd*(1+(e.noise||0))/50)*50).toLocaleString()} ม.`, tw = ctx.measureText(label).width;
-    ctx.fillStyle = sel ? PAL.signal : "rgba(29,33,28,.85)"; ctx.fillRect(W-44-tw-12, yy-12, tw+12, 24);
-    ctx.fillStyle = sel ? "#1d211c" : PAL.cream; ctx.fillText(label, W-50, yy+5);
-    indicatorsCache.push({e, sx: W-44-tw/2, sy: yy});
+    ctx.fillStyle = sel ? PAL.signal : e.boss ? "#ffd166" : "rgba(29,33,28,.85)"; ctx.beginPath(); ctx.moveTo(W-12, yy); ctx.lineTo(W-36, yy-14); ctx.lineTo(W-36, yy+14); ctx.closePath(); ctx.fill();
+    if (e.boss){ ctx.fillStyle = "rgba(29,33,28,.88)"; ctx.beginPath(); ctx.arc(W-50, yy, 10, 0, 7); ctx.fill(); ctx.fillStyle = "#ffd166"; ctx.font = "700 11px Kanit, sans-serif"; ctx.textAlign = "center"; ctx.fillText("B", W-50, yy+4); }
+    indicatorsCache.push({e, sx: e.boss ? W-50 : W-26, sy: yy});
   }
 }
 function drawWindblownDust(){
@@ -3713,6 +3740,8 @@ function loop(now){
   }
 }
 resize(); setMuteIcon();
+[["tableClose","table"],["gftClose","gft"],["logClose","log"]].forEach(([b,id])=>{ const btn=$(b), el=$(id); if (btn && el) btn.onclick = ()=>{ el.hidden = true; Audio.click(); }; });
+if ($("coachClose")) $("coachClose").onclick = ()=>{ coachDismissed = true; $("coach").hidden = true; Audio.click(); };
 try{ buildTables(); }catch(e){ console.error(e); }
 let started = false;
 function start(){ if (started) return; started = true;

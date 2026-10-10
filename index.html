@@ -226,6 +226,44 @@ body{background:#111713;color:#e9e2d0}
 .hp i{box-shadow:0 0 9px rgba(140,170,97,.2)}
 @media (max-width:640px){.panel{background:linear-gradient(160deg,rgba(38,45,38,.98),rgba(17,23,19,.97))}}
 
+
+/* ===== Realistic battlefield presentation pass ===== */
+:root{--ink:#111812;--sand:#e8e1cb;--signal:#e4773f;--danger:#d24b3d;--ok:#9eae68;--chip:rgba(28,36,29,.94);--card:#252e25;--card-ink:#eee7d4;--scrim:rgba(4,8,5,.76)}
+body{background:#151b16;color:#eee7d4}
+.hud{gap:8px;padding-top:calc(env(safe-area-inset-top,0px) + 12px);filter:drop-shadow(0 4px 10px rgba(0,0,0,.26))}
+.chip{background:linear-gradient(155deg,rgba(44,54,43,.96),rgba(17,24,19,.96));color:#eee7d4;border:1px solid rgba(218,219,192,.28);border-radius:8px;box-shadow:inset 0 1px rgba(255,255,255,.06),0 3px 12px rgba(0,0,0,.22);backdrop-filter:blur(8px)}
+.chip small{color:#c3c8b4;opacity:.9;letter-spacing:.025em}
+.icon-btn{background:linear-gradient(155deg,#e6dfc7,#bdb69e);border:1px solid rgba(255,255,255,.32);box-shadow:0 3px 0 rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.5);transition:transform .12s,filter .12s,background .12s}
+.icon-btn:active{transform:translateY(2px);filter:brightness(.9);box-shadow:0 1px 0 rgba(0,0,0,.42)}
+.tools{gap:7px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.22))}
+.tools .icon-btn[aria-pressed="true"]{background:linear-gradient(145deg,#e4773f,#b84b2a);border-color:#f2b184}
+.tools .icon-btn[aria-pressed="true"] svg *{stroke:#fff0d7}
+.panel{background:linear-gradient(150deg,rgba(42,51,40,.98),rgba(13,19,15,.98));color:#eee7d4;border:1px solid rgba(229,223,198,.36);border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.07);backdrop-filter:blur(12px);padding:10px 12px}
+.elev .val b{font-family:var(--display);font-size:28px;letter-spacing:.03em;color:#f0e8d1;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.elev .val small{color:#c7cbb8}
+.elev input{accent-color:#e4773f}
+.step{color:#eee7d4;border:1px solid rgba(225,220,196,.32);background:rgba(255,255,255,.06);border-radius:9px;box-shadow:inset 0 1px rgba(255,255,255,.05)}
+.seg{border:1px solid rgba(225,220,196,.28);border-radius:8px;background:rgba(0,0,0,.16)}
+.seg button{color:#e6e2d2;border-right-color:rgba(225,220,196,.15)}
+.seg button[aria-pressed="true"]{background:linear-gradient(145deg,#d96b37,#a84729);color:#fff1d9}
+.fire{background:radial-gradient(circle at 35% 25%,#ffad6c,#e06a35 55%,#a63f25);color:#fff2dc;border-color:#f3bd8d;box-shadow:0 5px 0 #512b1d,0 8px 20px rgba(0,0,0,.35),inset 0 2px rgba(255,255,255,.24);text-shadow:0 2px 3px rgba(0,0,0,.28);transition:filter .12s,transform .12s}
+.fire:active{transform:translateY(4px);box-shadow:0 1px 0 #512b1d}
+.table{background:rgba(25,33,26,.97);color:#eee7d4;border:1px solid rgba(225,220,196,.3);border-radius:12px;box-shadow:0 14px 36px rgba(0,0,0,.48);backdrop-filter:blur(12px)}
+.table th{border-bottom-color:rgba(225,220,196,.3)}
+.table tr.near td{outline-color:rgba(225,220,196,.2)}
+.table td.cur{background:#e4773f;color:#171d16}
+.toast{background:rgba(17,25,19,.96);border:1px solid rgba(225,220,196,.3);box-shadow:0 8px 28px rgba(0,0,0,.4);color:#f2ead4;backdrop-filter:blur(10px)}
+.toast.warn{background:rgba(119,35,27,.97);color:#fff}
+.overlay{backdrop-filter:blur(7px)}
+.card{background:linear-gradient(145deg,#30392d,#1a231b);color:#eee7d4;border:1px solid rgba(225,220,196,.34);border-radius:14px;box-shadow:0 24px 70px rgba(0,0,0,.58)}
+.card h2{color:#f2e9d0;text-shadow:0 3px 0 rgba(0,0,0,.24)}
+.card p{color:#d4d6c5}
+.badge{background:#e4773f;color:#171d16;border-color:#111812;box-shadow:0 2px 5px rgba(0,0,0,.35)}
+.hp{background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.08)}
+.hp i{box-shadow:0 0 10px rgba(158,174,104,.34)}
+@media(max-width:640px){.panel{background:linear-gradient(160deg,rgba(38,47,37,.98),rgba(15,21,17,.98));padding:9px}.tools{gap:5px}.dock{gap:7px}}
+@media(prefers-reduced-motion:reduce){.icon-btn,.fire,.btn{transition:none}}
+
 </style>
 </head>
 <body>
@@ -1836,6 +1874,16 @@ function explode(hit){
   if (rt === "smoke"){ smokes.push({x, t:0, max:30}); Audio.burst(0.5, 1200, 300, 0.4); for (let i=0;i<14;i++) parts.push({k:"smoke", x:x+(Math.random()-.5)*60, y:groundY(x)-10-Math.random()*40, vx:(Math.random()-.5)*60, vy:-20-Math.random()*30, life:0, max:4+Math.random()*2, s:30+Math.random()*30, a:0.75, white:true}); return; }
   if (rt === "illum"){ Audio.burst(0.3, 2400, 800, 0.35); parts.push({k:"flare", x, y, vx:windMs*0.8, vy:20, life:0, max:24}); lights.push({x, y, r:900, a:1.2, life:0, max:0.4, c:"255,245,220"}); return; }
   const RT = {he:{soft:1, hard:1, dir:1, crater:1}, air:{soft:2.1, hard:0.35, dir:1, crater:0}, delay:{soft:0.6, hard:0.8, dir:1.4, crater:1.7}}[rt];
+  // Cinematic impact package: expanding ground ring, flying soil and layered smoke.
+  if(!hit.air){
+    parts.push({k:"ring",x,y:groundY(x)-2,vx:0,vy:0,life:0,max:0.52,s:28});
+    for(let i=0;i<20;i++){
+      const a=Math.random()*Math.PI*2, speed=55+Math.random()*250;
+      parts.push({k:"debris",x:x+(Math.random()-.5)*20,y:groundY(x)-3,vx:Math.cos(a)*speed,vy:-35-Math.random()*210,life:0,max:0.65+Math.random()*1.2,s:2.5+Math.random()*6,r:Math.random()*6,vr:(Math.random()-.5)*18,c:Math.random()<.5?"104,88,61":"67,62,48"});
+    }
+    for(let i=0;i<18;i++) parts.push({k:"dust",x:x+(Math.random()-.5)*80,y:groundY(x)-4,vx:(Math.random()-.5)*150+wind*0.12,vy:-20-Math.random()*95,life:0,max:1.0+Math.random()*1.6,s:9+Math.random()*20,sand:true});
+    for(let i=0;i<9;i++) parts.push({k:"smoke",x:x+(Math.random()-.5)*50,y:groundY(x)-12,vx:wind*0.45+(Math.random()-.5)*24,vy:-18-Math.random()*24,life:0,max:2.2+Math.random()*2.4,s:15+Math.random()*22,a:.36,dark:true});
+  }
   if (hit.obstacle) damageObstacle(hit.obstacle, rt === "delay" ? 70 : 45);
   blast(x, y, {player:true, rt, craterK: RT.crater, air: rt === "air"});
   for (const d of drones) if (rt === "air" && Math.hypot(d.x - x, d.y - y) < 230*aoeK()){ d.hp = 0; texts.push({x:d.x, y:d.y - 30, s:"สอยโดรนข้าศึก!", life:0, max:2, hot:true}); medal("drone");
@@ -1844,6 +1892,13 @@ function explode(hit){
   hitObjects(x, y, rt, hit.object);
   for (const c of convoy) if (c.hp > 0 && Math.abs(c.x - x) < 260 && rt !== "smoke" && rt !== "illum"){ c.hp = Math.max(0, c.hp - (Math.abs(c.x - x) < 120 ? 45 : 20)); texts.push({x:c.x, y:groundY(c.x) - 300, s:"ยิงโดนรถฝ่ายเรา!", life:0, max:2, warn:true}); }
   damageStructsNear(x, y, rt, hit.struct);
+  if(rt !== "smoke" && rt !== "illum") for(const e of ents){
+    if(e.kind!=="inf" || e.hp<=0 || e.die>0 || Math.abs(e.x-x)>560) continue;
+    e.suppressionT=Math.max(e.suppressionT||0,1.2+Math.random()*2.1);
+    if(Math.abs(e.x-x)<360 && Math.random()<0.72 && !e.sniper && !e.engineer && !e.medic){
+      e.mode="cover";e.modeT=Math.max(e.modeT||0,1.0+Math.random()*2.2);e.face=Math.sign(x-e.x)||e.face||-1;
+    }
+  }
   if (L.ground.grass && rt === "he" && !hit.air && !SKIES[L.sky].rain && L.sky !== "fog" && Math.random() < 0.12) fires.push({x, w:16, t:0, max:22});
   if (L.bridge && L.bridge.alive && x > L.bridge.x0 - 80 && x < L.bridge.x1 + 80 && Math.abs(y - L.bridge.deckY) < 90) damageBridge({he:40, delay:75, air:8}[rt]*dmgK());
   let any = false, infKilled = 0;
@@ -1996,6 +2051,7 @@ function enemyAI(dt){
             if (B.fixT >= 45){ B.alive = true; B.hp = 60; B.fixT = 0; B.downT = 0; B.fixWarn = false; showToast("ข้าศึกซ่อมสะพานเสร็จแล้ว", 2600, true); } } }
       }
     } else if (e.kind === "inf" && e.die === 0){
+      e.suppressionT=Math.max(0,(e.suppressionT||0)-dt);
       const distM = m(e.x - SOCKET_X);
       if (!npcSpecial(e, dt)){
       e.modeT -= dt;
@@ -2945,6 +3001,7 @@ function render(){
   ctx.save(); ctx.scale(v.z,v.z); ctx.translate(-cam.x, -cam.y);
   for (const p of L.props) if (p.type !== "fire") drawProp(p);
   drawTerrain(v, sk);
+  if (!lowGfx()) drawBattlefieldSurface(v);
   for (const p of L.props) if (p.type === "fire") drawProp(p);
   for (const w of walls) drawWall(w);
   for (const o of L.obstacles) drawObstacle(o);
@@ -2994,6 +3051,7 @@ function render(){
   if (L.weather === "snow") drawSnow();
   if (L.weather === "sand"){ ctx.fillStyle = "rgba(196,160,104,.22)"; ctx.fillRect(0,0,W,H); drawSand(); }
   if (L.sky === "day" || L.sky === "dusk" || L.sky === "dawn") drawMotes();
+  drawWindblownDust();
   drawBallisticGuide(v);
   drawIndicators(v);
   if (warnT > 0){ ctx.fillStyle = `rgba(194,58,43,${0.25+0.2*Math.sin(clock*20)})`; ctx.fillRect(0,0,W,6); }
@@ -3019,6 +3077,31 @@ function ridge(arr, par, horizon, col, step, v, chimneys){
 }
 function hazeBand(horizon, col, h){ const g = ctx.createLinearGradient(0, horizon - H*h, 0, horizon + 60);
   g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, col); ctx.fillStyle = g; ctx.fillRect(0, horizon - H*h, W, H*h + 60); }
+function drawBattlefieldSurface(v){
+  // Low-cost deterministic rocks, scrub and track marks along the visible ground.
+  const x0=Math.floor((cam.x-80)/44)*44, x1=cam.x+v.w+100;
+  for(let x=x0;x<x1;x+=44){
+    const h=Math.abs(Math.sin(x*0.071+L.n*13.7)), h2=Math.abs(Math.sin(x*0.031+L.sector*4.2));
+    const gy=rawGround(x);
+    if(L.ground.grass && h>.28){
+      ctx.strokeStyle=`rgba(${L.sector===2?'65,75,43':'73,82,48'},${.16+h*.19})`;
+      ctx.lineWidth=1.2;ctx.beginPath();
+      for(let k=0;k<3;k++){const xx=x+(k-1)*4, hh=4+h2*8+k%2*3;ctx.moveTo(xx,gy-1);ctx.lineTo(xx-2+h*4,gy-hh);}
+      ctx.stroke();
+    }
+    if(h2>.54){
+      ctx.fillStyle=`rgba(28,26,20,${.12+h2*.12})`;ctx.beginPath();ctx.ellipse(x+((h*19)-9),gy+2,2+h*4,1+h2*1.8,h*.5,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(198,184,146,.13)';ctx.fillRect(x+8,gy-2,2+h*3,1.2);
+    }
+  }
+  // A few subtle vehicle ruts; their position is tied to world coordinates so they don't shimmer.
+  if(L.ground.dirt || L.sector===2){
+    ctx.strokeStyle='rgba(32,27,20,.12)';ctx.lineWidth=2;ctx.beginPath();
+    for(let x=x0;x<x1;x+=132){const gy=rawGround(x);ctx.moveTo(x,gy+10);ctx.quadraticCurveTo(x+28,gy+15,x+64,rawGround(x+64)+11);}
+    ctx.stroke();
+  }
+}
+
 function drawTerrain(v, sk){
   const x0 = Math.max(TX0, cam.x-40), x1 = Math.min(TX0+TN*TSTEP-8, cam.x+v.w+40), bottom = cam.y + v.h + 80;
   ctx.beginPath(); ctx.moveTo(x0, bottom);
@@ -3625,6 +3708,24 @@ function drawBallisticGuide(v){
   }
   ctx.restore();
 }
+function drawWindblownDust(){
+  if(!L || lowGfx() || L.weather==='snow' || L.weather==='rain' || L.sky==='rain') return;
+  const intensity=L.weather==='sand'?0.75:(L.sky==='fog'?0.22:0.12);
+  ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);
+  for(let i=0;i<22;i++){
+    const phase=clock*(18+(i%5)*7)+i*137.5;
+    const x=((phase*0.73 + i*79)%(W+100))-50;
+    const y=H*(0.48+((i*37)%47)/100)+Math.sin(clock*0.6+i)*8;
+    const len=8+(i%4)*7, a=intensity*(0.22+(i%5)*0.045);
+    ctx.strokeStyle=`rgba(214,198,157,${a})`;ctx.lineWidth=i%7===0?1.5:1;
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+len+windMs*0.4,y+0.6);ctx.stroke();
+  }
+  if(L.weather==='sand'){
+    const haze=ctx.createLinearGradient(0,H*.45,0,H);haze.addColorStop(0,'rgba(157,125,79,0)');haze.addColorStop(1,'rgba(157,125,79,.12)');ctx.fillStyle=haze;ctx.fillRect(0,H*.45,W,H*.55);
+  }
+  ctx.restore();
+}
+
 function drawCinematicGrade(){
   if (!ctx || !W || !H) return;
   ctx.save(); ctx.setTransform(DPR,0,0,DPR,0,0); ctx.globalCompositeOperation="source-over";

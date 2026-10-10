@@ -294,7 +294,6 @@ body{background:#151b16;color:#eee7d4}
     <button class="icon-btn" id="salvoBtn" aria-label="ยิงหาผลชุด 3 นัด" aria-pressed="false" style="font-weight:600;font-size:13px">×3</button>
     <button class="icon-btn" id="gftBtn" aria-label="ไม้บรรทัดคำนวณการยิง" aria-pressed="false"><svg viewBox="0 0 20 20"><rect x="2" y="7" width="16" height="7" rx="1" stroke="#1d211c" stroke-width="1.6" fill="none"/><path d="M5 7v3M8 7v2M11 7v3M14 7v2M10 4v13" stroke="#1d211c" stroke-width="1.4"/></svg></button>
     <button class="icon-btn" id="logBtn" aria-label="บันทึกการยิง" aria-pressed="false"><svg viewBox="0 0 20 20"><path d="M5 3h10v14H5z" stroke="#1d211c" stroke-width="1.8" fill="none"/><path d="M7.5 7h5M7.5 10h5M7.5 13h3" stroke="#1d211c" stroke-width="1.5"/></svg></button>
-    <button class="icon-btn" id="assistAimBtn" aria-label="ช่วยคำนวณมุมยิงไปยังเป้าหมาย" title="ช่วยเล็งเป้าหมาย"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" stroke="#1d211c" stroke-width="1.6" fill="none"/><circle cx="10" cy="10" r="2" stroke="#1d211c" stroke-width="1.6" fill="none"/><path d="M10 1v4M10 15v4M1 10h4M15 10h4" stroke="#1d211c" stroke-width="1.6"/></svg></button>
     <button class="icon-btn" id="tableBtn" aria-label="ตารางยิง" aria-pressed="false"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="#1d211c" stroke-width="1.8" fill="none"/><path d="M3 8h14M3 12.5h14M8.5 3v14" stroke="#1d211c" stroke-width="1.5"/></svg></button>
     <button class="icon-btn" id="scopeBtn" aria-label="ส่องเป้า" aria-pressed="false"><svg viewBox="0 0 20 20"><circle cx="6" cy="12" r="3.6" stroke="#1d211c" stroke-width="1.8" fill="none"/><circle cx="14" cy="12" r="3.6" stroke="#1d211c" stroke-width="1.8" fill="none"/><path d="M9.6 12h0.8M4 8.5l2-4h2.5M16 8.5l-2-4h-2.5" stroke="#1d211c" stroke-width="1.6" fill="none"/></svg></button>
     <button class="icon-btn" id="homeBtn" aria-label="กลับไปที่ตั้งปืน" hidden><svg viewBox="0 0 20 20"><path d="M3 10l7-6 7 6M5 8.5V16h10V8.5" stroke="#1d211c" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></button>
@@ -609,10 +608,10 @@ const SECTORS = [
 ];
 const MAX_LEVEL = SECTORS.length * 10;
 const DIFFS = {
-  easy:   {label:"ง่าย",   note:"เส้นเล็งเต็ม ข้าศึกยิงช้าและแรงน้อย กระสุนมาก ผู้ตรวจการณ์บอกมิลให้", eInt:1.45, eErr:1.3, eDmg:0.6, ammo:1.3, disp:0.7, preview:1, foFree:true, est:true, bonus:0},
+  easy:   {label:"ง่าย",   note:"เห็นแนวลำกล้องเท่านั้น ข้าศึกยิงช้าและแรงน้อย กระสุนมาก ผู้ตรวจการณ์ช่วยบอกทิศแก้ระยะ", eInt:1.45, eErr:1.3, eDmg:0.6, ammo:1.3, disp:0.7, preview:1, foFree:true, est:true, bonus:0},
   normal: {label:"ปกติ",  note:"ค่ามาตรฐานของเกม", eInt:1, eErr:1, eDmg:1, ammo:1, disp:1, preview:null, foFree:false, est:true, bonus:0},
-  hard:   {label:"ยาก",   note:"ไม่มีเส้นเล็ง ข้าศึกยิงถี่และแม่นขึ้น กระสุนน้อยลง · ผ่านได้ดาวโบนัส +1", eInt:0.8, eErr:0.85, eDmg:1.25, ammo:0.85, disp:1, preview:0, foFree:false, est:true, bonus:1},
-  real:   {label:"สมจริง", note:"แบบยาก และไม่มีตัวช่วย: ไม่บอกระยะประมาณใต้มิล ข้าศึกที่มองไม่เห็นจะหายไปจากจอ · ดาวโบนัส +2", eInt:0.8, eErr:0.85, eDmg:1.25, ammo:0.85, disp:1, preview:0, foFree:false, est:false, hideUnseen:true, bonus:2},
+  hard:   {label:"ยาก",   note:"ไม่มีแนวช่วยเล็ง ข้าศึกยิงถี่และแม่นขึ้น กระสุนน้อยลง · ผ่านได้ดาวโบนัส +1", eInt:0.8, eErr:0.85, eDmg:1.25, ammo:0.85, disp:1, preview:0, foFree:false, est:true, bonus:1},
+  real:   {label:"สมจริง", note:"ไม่มีตัวช่วยเล็งหรือระยะประมาณ ข้าศึกที่มองไม่เห็นจะหายไปจากจอ · ดาวโบนัส +2", eInt:0.8, eErr:0.85, eDmg:1.25, ammo:0.85, disp:1, preview:0, foFree:false, est:false, hideUnseen:true, bonus:2},
 };
 const D = () => DIFFS[save.diff || "normal"];
 
@@ -1079,7 +1078,7 @@ function showBriefing(n){
     ["ระยะข้าศึก", `${near.toLocaleString()}–${far.toLocaleString()} ม.`], ["ระลอก", L.waves.length ? `${L.waves.length+1} ระลอก (มีเสบียงเติมทุกระลอก)` : "1 ระลอก"], ["ข่าวอากาศ", `${L.met.temp}°C · ${L.met.press} hPa (ตารางยิงอิง 21°C 1013 hPa)`], ["พื้นดิน", L.ground.name],
     ["อากาศพิเศษ", L.weather === "sand" ? "พายุทราย: มองไกลได้ไม่เกิน 1,800 ม. ใช้โดรนช่วย" : L.weather === "snow" ? "หิมะ: พื้นนุ่มดูดสะเก็ด" : "—"],
     ["ข้าศึก", Object.entries(counts).map(([k,v]) => `${NAMES[k]} ${v}`).join(", ")], ["กระสุน", n === 0 ? "ไม่จำกัด" : `<span id="bAmmo">${ammoStart}</span> นัด`],
-    ["เส้นเล็ง", L.preview>=1 ? "เต็ม" : L.preview>0 ? "ช่วงต้น" : "ไม่มี"]];
+    ["แนวช่วยเล็ง", "แนวลำกล้องเท่านั้น"]];
   $("bList").innerHTML = list.map(([a,b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
   L.objectives = makeObjectives(); $("bObj").innerHTML = objHtml().replace(/class="done"/g, "");
   renderDiff(); renderTrainSettings();
@@ -2329,19 +2328,6 @@ function holdRepeat(btn, fn){
 holdRepeat($("elUp"), s => { mil = clamp(mil + s, MILMIN, MILMAX); updateAim(); });
 holdRepeat($("elDown"), s => { mil = clamp(mil - s, MILMIN, MILMAX); updateAim(); });
 $("fireBtn").onclick = () => fire();
-$("assistAimBtn").onclick = () => {
-  if (!L || !["aim","settle"].includes(state)){ showToast("เปิดสนามก่อนใช้ระบบช่วยเล็ง", 1800); return; }
-  const target = selected && selected.hp > 0 ? selected : nearestAlive();
-  if (!target){ showToast("ยังไม่มีเป้าหมายที่เลือกได้", 1800); return; }
-  selected = target;
-  const range = m(target.x - SOCKET_X);
-  const solution = milFor(weapon, charge, range);
-  if (!solution){ showToast(`เป้าหมายอยู่ที่ ${range.toLocaleString()} ม. นอกระยะดินส่งนี้ ลองเปลี่ยนดินส่ง`, 2600, true); updateTargetChip(); return; }
-  mil = clamp(solution.mil, MILMIN, MILMAX);
-  updateAim();
-  showToast(`ช่วยเล็ง: ${NAMES[target.kind] || "เป้าหมาย"} ระยะ ${range.toLocaleString()} ม. · มุม ${mil} มิล (${thetaDeg().toFixed(1)}°) · เวลาลอย ~${solution.t.toFixed(1)} วิ`, 3200);
-  Audio.click();
-};
 $("uavBtn").onclick = () => { if (!["aim","flight","settle"].includes(state) || uavLeft <= 0 || uav) return;
   const tgt = selected && selected.hp > 0 ? selected.x : cam.x + view().w/2; uavLeft--; uav = {x: SOCKET_X, tx: tgt, t: 32, on:false}; updateHud(); Audio.click();
   showToast(`ส่งโดรนตรวจการณ์ไปที่ ${m(tgt - SOCKET_X).toLocaleString()} ม.`, 2000); };
@@ -3012,7 +2998,6 @@ function render(){
   windsock(SOCKET_X - 120);
   for (const e of ents) drawEnt(e);
   for (const c of corpses) drawCorpse(c);
-  drawTrails();
   drawShotMarkers();
   if (weapon !== "120") drawCrate(SOCKET_X - 80);
   const anim = loadAnim(), rig = rigSolve(thetaDeg(), SOCKET_X, groundY(SOCKET_X), recoil, anim);
@@ -3052,7 +3037,6 @@ function render(){
   if (L.weather === "sand"){ ctx.fillStyle = "rgba(196,160,104,.22)"; ctx.fillRect(0,0,W,H); drawSand(); }
   if (L.sky === "day" || L.sky === "dusk" || L.sky === "dawn") drawMotes();
   drawWindblownDust();
-  drawBallisticGuide(v);
   drawIndicators(v);
   if (warnT > 0){ ctx.fillStyle = `rgba(194,58,43,${0.25+0.2*Math.sin(clock*20)})`; ctx.fillRect(0,0,W,6); }
   if (hurtFlash > 0){ const g = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.3,W/2,H/2,Math.max(W,H)*0.75);
@@ -3421,14 +3405,7 @@ function drawSelection(){
 }
 function previewLen(){ const d = D().preview; return L.n === 0 ? (d === 0 ? 0 : 1) : d == null ? L.preview : d; }
 function drawPreview(rig){
-  if (previewLen() <= 0){ drawElevArc(rig); return; }
-  const pts = [];
-  simulate(chargeV(weapon, charge)/MPU, thetaDeg(), rig.muzzle[0], rig.muzzle[1], false, 80, (x,y) => { pts.push([x,y]); return walls.some(w=>inBox(wallRect(w),x,y)) || !!hitObstacle(x,y) || !!structAt(x,y); }, weapon, 1/30);
-  const n = Math.max(6, Math.floor(pts.length * previewLen()));
-  for (let i=4; i<n; i+=5){ const a = 1 - i/n*0.85;
-    ctx.fillStyle = `rgba(239,229,201,${a})`; ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], 6, 0, 7); ctx.fill();
-    ctx.fillStyle = `rgba(224,97,44,${a})`; ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], 3.6, 0, 7); ctx.fill(); }
-  if (previewLen() >= 1 && pts.length){ const e = pts[pts.length-1]; ctx.strokeStyle = PAL.signal; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(e[0], e[1]-2, 16, 0, 7); ctx.stroke(); }
+  // Fair aiming aid: show only the mortar barrel's current elevation, never the shell path or impact point.
   drawElevArc(rig);
 }
 function drawElevArc(rig){ const mz = rig.muzzle, th = rad(thetaDeg());
@@ -3672,41 +3649,6 @@ function drawIndicators(v){
     ctx.fillStyle = sel ? "#1d211c" : PAL.cream; ctx.fillText(label, W-50, yy+5);
     indicatorsCache.push({e, sx: W-44-tw/2, sy: yy});
   }
-}
-function drawBallisticGuide(v){
-  if (!(state === "aim" || state === "settle") || !L || !Number.isFinite(mil)) return;
-  const sol = estRange(weapon, charge, mil);
-  if (!sol || !Number.isFinite(sol.r) || sol.r <= 0) return;
-  const angle = thetaDeg(), rangeU = sol.r / MPU;
-  const rig = rigSolve(angle, SOCKET_X, groundY(SOCKET_X), 0);
-  if (!rig || !rig.muzzle) return;
-  const start = rig.muzzle, endX = SOCKET_X + rangeU, endY = groundY(endX);
-  const peak = Math.min(rangeU * 0.30, Math.max(28, Math.tan(rad(clamp(angle, 8, 86))) * rangeU * 0.19));
-  const toScreen = (x,y) => [(x-cam.x)*v.z, (y-cam.y)*v.z];
-  const a = toScreen(start[0], start[1]), b = toScreen(endX, endY);
-  if (b[0] < -80 || a[0] > W+80) return;
-  ctx.save();
-  ctx.lineWidth = 4; ctx.strokeStyle = "rgba(8,13,10,.35)"; ctx.setLineDash([7,9]);
-  ctx.beginPath();
-  for (let i=0;i<=44;i++){
-    const t=i/44, x=lerp(start[0],endX,t);
-    const baseY=lerp(start[1],endY,t);
-    const y=baseY-4*peak*t*(1-t);
-    const q=toScreen(x,y); if(i===0)ctx.moveTo(q[0],q[1]);else ctx.lineTo(q[0],q[1]);
-  }
-  ctx.stroke();
-  ctx.lineWidth=2; ctx.strokeStyle="rgba(239,220,166,.9)"; ctx.setLineDash([5,8]); ctx.stroke(); ctx.setLineDash([]);
-  const pulse=0.65+0.35*Math.sin(clock*4);
-  ctx.beginPath(); ctx.arc(b[0],b[1],5+2*pulse,0,Math.PI*2); ctx.fillStyle=`rgba(235,112,57,${0.55+0.3*pulse})`; ctx.fill();
-  ctx.beginPath(); ctx.arc(b[0],b[1],11+2*pulse,0,Math.PI*2); ctx.strokeStyle=`rgba(235,112,57,${0.7*pulse})`; ctx.lineWidth=1.5; ctx.stroke();
-  if (b[0] > 40 && b[0] < W-40 && b[1] > 25 && b[1] < H-30){
-    const label=`คาดการณ์ ${Math.round(sol.r).toLocaleString()} ม.`;
-    ctx.font="600 12px Kanit, sans-serif"; const tw=ctx.measureText(label).width;
-    ctx.fillStyle="rgba(15,21,17,.82)"; ctx.fillRect(b[0]-tw/2-8,b[1]+15,tw+16,23);
-    ctx.strokeStyle="rgba(226,215,185,.35)";ctx.strokeRect(b[0]-tw/2-8,b[1]+15,tw+16,23);
-    ctx.fillStyle="#eee4ca";ctx.textAlign="center";ctx.fillText(label,b[0],b[1]+31);
-  }
-  ctx.restore();
 }
 function drawWindblownDust(){
   if(!L || lowGfx() || L.weather==='snow' || L.weather==='rain' || L.sky==='rain') return;
